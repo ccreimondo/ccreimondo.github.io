@@ -3,7 +3,7 @@ Data structure
 2014.12.03
 
 ##Primitive variables
-Single variabel & pointer.
+>Single variabel & pointer.
 
 ##Arrays
 >A list of a fixed length.
