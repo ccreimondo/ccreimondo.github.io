@@ -872,16 +872,16 @@ body .markdown-body
 <h4>
 <a id="user-content-prepare" class="anchor" href="#prepare" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prepare</h4>
 
-<div class="highlight highlight-bash"><pre>// su root
+<div class="highlight highlight-bash"><pre><span class="pl-c"># su root</span>
 <span class="pl-vo">$su</span> root
-// Make a workspace
-<span class="pl-c">#mkdir os</span>
-// Copy one src-linux.iso into os
-<span class="pl-c">#cp linux.iso os</span>
-// Make a folder to mount the linux.iso and mount
-<span class="pl-c">#mkdir media &amp;&amp; mount -o loop linux.iso media</span>
-// File mount <span class="pl-k">in</span> the media is <span class="pl-s3">read</span>-only, cp to another file
-<span class="pl-c">#mkdir iso.linux &amp;&amp; cp -af media iso.linux</span></pre></div>
+<span class="pl-c"># Make a workspace</span>
+mkdir os
+<span class="pl-c"># Copy one src-linux.iso into os</span>
+cp linux.iso os
+<span class="pl-c"># Make a folder to mount the linux.iso and mount</span>
+mkdir media <span class="pl-k">&amp;&amp;</span> mount -o loop linux.iso media
+<span class="pl-c"># File mount in the media is read-only, cp to another file</span>
+mkdir iso.linux <span class="pl-k">&amp;&amp;</span> cp -af media iso.linux</pre></div>
 
 <h4>
 <a id="user-content-main-related-directroy-or-file-about-isolinux" class="anchor" href="#main-related-directroy-or-file-about-isolinux" aria-hidden="true"><span class="octicon octicon-link"></span></a>Main related directroy or file about iso.linux</h4>
@@ -904,10 +904,10 @@ body .markdown-body
 <h4>
 <a id="user-content-get-core-system" class="anchor" href="#get-core-system" aria-hidden="true"><span class="octicon octicon-link"></span></a>Get core system</h4>
 
-<div class="highlight highlight-bash"><pre>// Move filesystem.squashfs into os
-<span class="pl-c">#mv iso.linux/casper/filesystem.squashfs .</span>
-// Bring system from filesyste.squashfs into os.linux
-<span class="pl-c">#unsquashfs -d os.linux filesystem.squashfs</span>
+<div class="highlight highlight-bash"><pre><span class="pl-c"># Move filesystem.squashfs into os</span>
+mv iso.linux/casper/filesystem.squashfs <span class="pl-s3">.</span>
+<span class="pl-c"># Bring system from filesyste.squashfs into os.linux</span>
+unsquashfs -d os.linux filesystem.squashfs
 </pre></div>
 
 <p><a href="/home/reimondo/Local/Workspace/Projects/CCreimondo.github.io/linux_mkiso_about/os_linux.png" target="_blank"><img src="/home/reimondo/Local/Workspace/Projects/CCreimondo.github.io/linux_mkiso_about/os_linux.png" alt="os_linux_files" style="max-width:100%;"></a></p>
@@ -915,44 +915,44 @@ body .markdown-body
 <h4>
 <a id="user-content-modify-sth" class="anchor" href="#modify-sth" aria-hidden="true"><span class="octicon octicon-link"></span></a>Modify sth..</h4>
 
-<div class="highlight highlight-bash"><pre>// You can chroot os.linux
-<span class="pl-c">#chroot os.linux</span>
-// We can mount some directory
-// But U must umount before <span class="pl-s3">exit</span> chroot
-<span class="pl-c">#mount -t proc none /proc</span>
-<span class="pl-c">#mount --bind sys /sys</span>
-<span class="pl-c">#mount --bind etc /etc</span>
-... // Forget...
-// Add DNS <span class="pl-k">if</span> using apt-get
-<span class="pl-c">#echo "202.5.5.5" &gt; etc/hostname  // Ali public DNS</span>
-// Modify thems related<span class="pl-k">?</span>
-<span class="pl-c">#cd os.linux/lib/plymouth/themes/</span>
-// When finishing, save it into iso.linux/casper
-// Only one filesystem.squashfs <span class="pl-k">in</span> casper/
-<span class="pl-c">#cd os &amp;&amp; mksquashfs os.linux iso.linux/casper/filesystem.squashfs</span>
+<div class="highlight highlight-bash"><pre><span class="pl-c"># You can chroot os.linux</span>
+chroot os.linux
+<span class="pl-c"># We can mount some directory</span>
+<span class="pl-c"># But U must umount before exit chroot</span>
+mount -t proc none /proc
+mount --bind sys /sys
+mount --bind etc /etc
+... <span class="pl-c"># Forget...</span>
+<span class="pl-c"># Add DNS if using apt-get</span>
+<span class="pl-s3">echo</span> <span class="pl-s1"><span class="pl-pds">"</span>202.5.5.5<span class="pl-pds">"</span></span> <span class="pl-k">&gt;</span> etc/hostname  <span class="pl-c"># Ali public DNS</span>
+<span class="pl-c"># Modify thems related?</span>
+<span class="pl-s3">cd</span> os.linux/lib/plymouth/themes/
+<span class="pl-c"># When finishing, save it into iso.linux/casper</span>
+<span class="pl-c"># Only one filesystem.squashfs in casper/</span>
+<span class="pl-s3">cd</span> os <span class="pl-k">&amp;&amp;</span> mksquashfs os.linux iso.linux/casper/filesystem.squashfs
 
-// Modify initrd.lz
-// We use 7z
-<span class="pl-c">#apt-get install p7zip-full</span>
-// <span class="pl-s3">cd</span> into casper
-<span class="pl-c">#cd os/iso.linux/casper</span>
-<span class="pl-c">#7z x initrd.lz</span>
-// Create a tmp file to save initrd file
-<span class="pl-c">#mkdir TMP &amp;&amp; cd TMP &amp;&amp; cpio -i &lt; ../initrd</span>
-// U can try modify themes<span class="pl-k">?</span>
-<span class="pl-c">#cd lib/plymouth/themes</span>
-// When finishing, save to initrd.lz
-<span class="pl-c">#find . | cpio -o -H newc | lzma -7 &gt; ../initrd.lz</span>
-// Delete tmp files
-<span class="pl-c">#cd .. &amp;&amp; rm -rf TMP initrd</span></pre></div>
+<span class="pl-c"># Modify initrd.lz</span>
+<span class="pl-c"># We use 7z</span>
+apt-get install p7zip-full
+<span class="pl-c"># cd into casper</span>
+<span class="pl-s3">cd</span> os/iso.linux/casper
+7z x initrd.lz
+<span class="pl-c"># Create a tmp file to save initrd file</span>
+mkdir TMP <span class="pl-k">&amp;&amp;</span> <span class="pl-s3">cd</span> TMP <span class="pl-k">&amp;&amp;</span> cpio -i <span class="pl-k">&lt;</span> ../initrd
+<span class="pl-c"># U can try modify themes?</span>
+<span class="pl-s3">cd</span> lib/plymouth/themes
+<span class="pl-c"># When finishing, save to initrd.lz</span>
+find <span class="pl-s3">.</span> <span class="pl-k">|</span> cpio -o -H newc <span class="pl-k">|</span> lzma -7 <span class="pl-k">&gt;</span> ../initrd.lz
+<span class="pl-c"># Delete tmp files</span>
+<span class="pl-s3">cd</span> .. <span class="pl-k">&amp;&amp;</span> rm -rf TMP initrd</pre></div>
 
 <h4>
 <a id="user-content-make-custom-made-system-into-iso" class="anchor" href="#make-custom-made-system-into-iso" aria-hidden="true"><span class="octicon octicon-link"></span></a>Make custom-made system into iso</h4>
 
-<div class="highlight highlight-bash"><pre>// In iso.linux, using the following shell script
-// I using <span class="pl-c">#genisoimage in my debian-xfce</span>
-// Maybe using <span class="pl-c">#mkisofs</span>
-// <span class="pl-vo">$start</span> shell script
+<div class="highlight highlight-bash"><pre><span class="pl-c"># In iso.linux, using the following shell script</span>
+<span class="pl-c"># I using #genisoimage in my debian-xfce</span>
+<span class="pl-c"># Maybe using #mkisofs</span>
+<span class="pl-c"># $start shell script</span>
 <span class="pl-c">#!/bin/sh</span>
 NAME=<span class="pl-vo">$1</span>
 
@@ -963,9 +963,9 @@ rm -f ../<span class="pl-vo">$NAME</span>.iso
 genisoimage -r -V <span class="pl-s1"><span class="pl-pds">"</span><span class="pl-vo">$NAME</span><span class="pl-pds">"</span></span> --cache-inodes -J -l -b \
 isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot \
 -boot-load-size 4 -boot-info-table -o ../<span class="pl-vo">$NAME</span>.iso <span class="pl-s3">.</span>
-// <span class="pl-vo">$end</span> shell script
-<span class="pl-c">#cd iso.linux &amp;&amp; sh genisoimage.sh my_linux.iso</span>
-// DOWN<span class="pl-k">!</span> You can see a new my_linux.iso <span class="pl-k">in</span> os</pre></div>
+<span class="pl-c"># $end shell script</span>
+<span class="pl-s3">cd</span> iso.linux <span class="pl-k">&amp;&amp;</span> sh genisoimage.sh my_linux.iso
+<span class="pl-c"># DOWN! You can see a new my_linux.iso in os</span></pre></div>
 
 <h4>
 <a id="user-content-task" class="anchor" href="#task" aria-hidden="true"><span class="octicon octicon-link"></span></a>Task</h4>
