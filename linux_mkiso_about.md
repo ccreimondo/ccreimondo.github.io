@@ -49,7 +49,7 @@ unsquashfs -d os.linux filesystem.squashfs
 
 ```
 
-![os_linux_files](linux_mkiso_about/os_linux.png)
+![os_linux_files](./linux_mkiso_about/os_linux.png)
 
 ####Modify sth..
 ```bash
