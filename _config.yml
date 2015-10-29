@@ -16,4 +16,5 @@ twitter_username: ccreimondo
 github_username: ccreimondo
 
 # Build settings
-markdown: kramdown
+# markdown: kramdown
+markdown: redcarpet
