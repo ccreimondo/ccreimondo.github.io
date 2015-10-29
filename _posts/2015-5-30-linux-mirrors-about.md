@@ -1,15 +1,15 @@
-Linux mirrors about
-===
-<!-- Each change should be recorded here -->
-<!-- Format: YYYY-MM-DD COMMENT @YOU_ID -->
-2015-3-29 First script @ccreimondo
-
->Points:
->0. List of mirrors
->1. Requirements for creating a new mirror
->2. How to do it
->3. User guidance for selecting and configuring mirror
->4. Extra information...
+---
+layout: post
+title: Linux mirrors about
+date:   2015-10-26 13:33:11
+categories: linux update
+---
+Points:
+- List of mirrors
+- Requirements for creating a new mirror
+- How to do it
+- User guidance for selecting and configuring mirror
+- Extra information...
 
 ##Ubuntu
 - [Official archive mirrors for Ubuntu](https://launchpad.net/ubuntu/+archivemirrors)

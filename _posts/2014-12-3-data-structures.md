@@ -1,7 +1,9 @@
-Data structure
-===
-2014.12.03
-
+---
+layout: post
+title:  "Data structures"
+date:   2014-12-3 13:33:11
+categories: ds update
+---
 ##Primitive variables
 >Single variabel & pointer.
 
@@ -65,6 +67,5 @@ Data structure
 - Weakness
     - Need a good method to make hash
 
-------
-Reference:
-http://community.topcoder.com/tc?module=Static&d1=tutorials&d2=dataStructures
+reference:
+[topcoder](http://community.topcoder.com/tc?module=Static&d1=tutorials&d2=dataStructures)

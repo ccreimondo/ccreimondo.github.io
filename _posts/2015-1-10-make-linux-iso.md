@@ -1,8 +1,9 @@
-linux.iso custom made...
-===
-
-2015.1.10
-
+---
+layout: post
+title:  "Try to create a linux iso"
+date:   2015-1-10 13:33:11
+categories: linux update
+---
 >Write down quickly, from Franklin Weng's oral-copy. I have just tried kubuntu...
 
 ####Prepare
@@ -49,7 +50,7 @@ unsquashfs -d os.linux filesystem.squashfs
 
 ```
 
-![os_linux_files](./linux_mkiso_about/os_linux.png)
+![os_linux_files](linux-mkiso-about/os-linux.png)
 
 ####Modify sth..
 ```bash
