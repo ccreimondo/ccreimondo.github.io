@@ -2,7 +2,7 @@
 layout: post
 title:  "Gitlab Install and Nginx Proxy"
 date:   2015-11-21 15:22:00
-categories: notes update
+categories: howto nginx
 ---
 
 - 探索 nginx reverse proxy feature.

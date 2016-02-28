@@ -2,7 +2,7 @@
 layout: post
 title:  "Data Structures"
 date:   2014-12-3 13:33:11
-categories: ds update
+categories: notes ds
 ---
 
 ##Primitive Variables

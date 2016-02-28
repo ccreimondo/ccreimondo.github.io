@@ -1,10 +1,10 @@
 ---
 layout: post
-title:  "Try to create a linux iso"
+title:  "Try to Create a Linux ISO"
 date:   2015-1-10 13:33:11
-categories: linux update
+categories: howto linux
 ---
->Write down quickly, from Franklin Weng's oral-copy. I have just tried kubuntu...
+>Franklin Weng's oral-copy. I have just tried kubuntu...
 
 ####Prepare
 
