@@ -18,3 +18,5 @@ github_username: ccreimondo
 # Build settings
 markdown: kramdown
 # markdown: redcarpet
+#
+timezone: Asia/Chongqing
