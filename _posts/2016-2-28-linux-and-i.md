@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Me and Linux"
+title:  "Linux and I"
 date:   2016-2-28 14:45:00
 categories: notes linux
 ---
