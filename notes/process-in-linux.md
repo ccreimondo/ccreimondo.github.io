@@ -3,16 +3,18 @@
 
 ## Memory Architecture of Process
 ### Paging
-Linux 采用四级分页模型 (PGD, [PUD, PMD,] PT)。 其中 Page Size 取决于线性地址中的 offset 位数，典型的，Linux 使用 12bits，即页大小为 4KB。
+Linux采用四级分页模型（PGD, [PUD, PMD,] PT)。其中页大小取决于线性地址中的offset位数，典型的，Linux使用12bits，即页大小为4KB。
 ### Setup Memory
-Linux 启动过程中，借住 BIOS 构建物理地址映射。内核代码（text）、数据（data）占据物理内存前 3MB RAM（包括保留空间）。线性地址以 0xc0000000 分界，低地址为内核态进程可寻址空间。内核创建并维护自己的页表（master kernel PGD)。借助这些页中的数据，内核便可进行线性地址到物理地址的转换。
+Linux启动过程中，借住BIOS构建物理地址映射。内核代码（text）、数据（data）占据物理内存前3MB RAM（包括保留空间）。
+线性地址以0xc0000000分界，低地址为内核态进程可寻址空间。内核创建并维护自己的页表（master kernel PGD)。
+借助这些页中的数据，内核便可进行线性地址到物理地址的转换。
 ### Allocating the Process Descriptor
 ### Try to Trace Process Kernel Stack
 
 ## Process-covered Files
 
 ## Process Descriptor
-这里简单的看一看 `task_struct`. 可以认为这些是进程管理所需要的基本元素。
+这里简单的看一看 `task_struct`. 可以认为以下是进程管理所需要的基本元素。
 ### State
 bitmask of tsk->state:
 ```c
@@ -32,24 +34,97 @@ bitmask of tsk->state:
 - `TASK_UNINTERRUPTIBLE`: 进程不对信号做响应。这个状态通常在进程必须在等待时不受干扰或等待时间就会发生时出现。
 - `__TASK_STOPPED`: 进程停止执行。e.g. 接收到 `SIGSTOP`, `SIGTSTP`, `SIGTTIN`, `SIGTTOU`; debugging 期间接受到任何信号。
 - `__TASK_TRACED`: 被其他进程跟踪的进程。e.g. 通过 ptrace 对调试程序进行跟踪。
+
 bitmask of tsk->exit_state:
 ```c
 #define EXIT_ZOMBIE		16
 #define EXIT_DEAD		32
 ```
-- `EXIT_ZOMBIE`: 进程退出时的状态。处于该状态的该进程将不被调度。
-- `EXIT_DEAD`:
+- `EXIT_ZOMBIE`: 进程执行被终止，但是，父进程还没有发布 `wait4()` 或 `waitpid()` 系统调用来
+返回有关死亡进行的信息。
+- `EXIT_DEAD`: 最终状态，由于父进程刚发出 `wait4()` or `waitpid()` 系统调用，因而进程由系统删除。
+
 state variable in `task_struct`:
 ```c
 volatile long state;	/* -1 unrunnable, 0 runnable, >0 stopped */
+int exit_state;
 ```
-关于 volatile, Documentation/volatile-considered-harmful.txt 里面有这样的描述:
+关于`volatile`, Documentation/volatile-considered-harmful.txt 里面有这样的描述:
 >C程序员通常认为volatile表示某个变量可以在当前执行的线程之外被改变；因此，在内核
 >中用到共享数据结构时，常常会有C程序员喜欢使用volatile这类变量。换句话说，他们经
 >常会把volatile类型看成某种简易的原子变量，当然它们不是。。。
 
 ### Relationships Among Processes
+Linux 系统的进程之间存在一个明显的进程关系。
+```
+/* 
+ * Pointers to (original) parent process, youngest child, younger sibling,
+ * older sibling, respectively.  (p->father can be replaced with 
+ * p->real_parent->pid)
+ */
+struct task_struct *real_parent; /* real parent process */
+struct task_struct *parent; /* recipient of SIGCHLD, wait4() reports */
+struct list_head children;	/* list of my children */
+struct list_head sibling;	/* linkage in my parent's children list */
+struct task_struct *group_leader;	/* threadgroup leader */
+```
+- `real_parent`: 指向创建了P的进程的描述符，如果P的父进程不存在，就指向进程1（init）的描述符。
+- `parent`: 指向P的当前父进程（子进程终止时必须向其发信号）。一般，该值与`real_parent`一致，
+但偶尔也有不同，e.g. 某进程ptrace进程P。
+- `children`: 链表对头部，链表中的所有元素都是P创建的子进程。
+- `sibling`: 指向兄弟进程链表中的下一个（前一个）的指针，这些兄弟进程的父进程为P。
+- `group_leader`: 指向P所在线程组领头线程的描述符。
+
+>特别的，一个进程可能是一个进程组或者登录会话的领头进程，也可能是一个线程组的领头进程，它还可以
+>跟踪其他进程的执行。		*《深入理解 LINUX 内核 第三版》P.96*
+
 ### PID
+PID 用于标示进程。它在`task_struct`中的相关变量:
+```c
+pid_t pid;
+pid_t tgid;
+```
+- `tgid`: Thread Group ID, 该P所在线程组中第一个LWP的PID。一般进程只有一个线程，`tgid`与`pid`
+相同。`getpid()`返回`tgid`的值。
+
+>由于循环使用 PID 编号，内核必须通过管理一个pidmap-array位图来表示当前已分配的PID号和闲置的PID号。
+>因为一个页框包含32768个位，所以32位体系结构中pidmap-array位图存放在一个单独的页中。。。			
+>*《深入理解 LINUX 内核 第三版》P.88-89*
+
+In `include/linux/types.h`:
+```c
+typedef struct {
+	volatile int counter;
+} atomic_t;
+```
+
+In `include/linux/pid_namespace.h`:
+```c
+struct pidmap {
+       atomic_t nr_free;
+       void *page;
+};
+
+#define PIDMAP_ENTRIES         ((PID_MAX_LIMIT + 8*PAGE_SIZE - 1)/PAGE_SIZE/8)
+
+struct pid_namespace {
+	struct kref kref;
+	struct pidmap pidmap[PIDMAP_ENTRIES];
+	int last_pid;
+	struct task_struct *child_reaper;
+	struct kmem_cache *pid_cachep;
+	unsigned int level;
+	struct pid_namespace *parent;
+};
+```
+Related source files:
+```c
+include/linux/pid_namespace.h
+include/linux/pid.h
+kernel/pid_namespace.c
+kernel/pid.c
+```
 
 ## References
 1. Daniel P. Bovet, Marco Cesati. Understanding the Linux Kernel, 3rd Edition.
+2. Robert Love. Linux Kernel Development, 3rd Edition.
