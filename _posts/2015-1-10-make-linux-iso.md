@@ -4,93 +4,93 @@ title:  "Try to Create a Linux ISO"
 date:   2015-1-10 13:33:11
 categories: howto linux
 ---
->Franklin Weng's oral-copy. I have just tried kubuntu...
+This is just a scratch and I have just tried with Kubuntu...
 
-####Prepare
+## Prepare
 
-```bash
+~~~bash
 # su root
 $su root
-# Make a workspace
+# make a workspace
 mkdir os
-# Copy one src-linux.iso into os
+# copy one src-linux.iso into os
 cp linux.iso os
-# Make a folder to mount the linux.iso and mount
+# make a folder to mount the linux.iso and mount
 mkdir media && mount -o loop linux.iso media
-# File mount in the media is read-only, cp to another file
+# file mounted in the media is read-only, cp to another folder
 mkdir iso.linux && cp -af media iso.linux
-```
+~~~
 
-####Main related directroy or file about iso.linux
+## Related Directories or Files in iso.linux
 
-```bash
+~~~bash
 iso.linux
 |
 +---casper
 |   |
-|   +---filesystem.squashfs----> Main system
+|   +---filesystem.squashfs    # main system
 |   |
-|   +---initrd.lz----> Tiny-sys using when install...using BusyBox
+|   +---initrd.lz    # a tiny temp file system to boot kernel
 |
 |
-+---isolinux----> some configure file?...we always need configure sth. when installing
++---isolinux    # some configure files for linux installing?
 |   +
 |   |
 |   \---lang
 ...
-```
+~~~
 
-####Get core system
+## Extract Core System
 
-```bash
-# Move filesystem.squashfs into os
+~~~bash
+# move filesystem.squashfs into os
 mv iso.linux/casper/filesystem.squashfs .
-# Bring system from filesyste.squashfs into os.linux
+# bring system from filesyste.squashfs into os.linux
 unsquashfs -d os.linux filesystem.squashfs
-
-```
+~~~
 
 ![os linux files](http://ccreimondo.github.io/images/blog/linux-mkiso-about-os-linux.png)
 
-####Modify sth..
-```bash
-# You can chroot os.linux
+## Custom sth.
+
+~~~bash
+# you can chroot os.linux
 chroot os.linux
-# We can mount some directory
-# But U must umount before exit chroot
+# We can mount some directories and don't forget
+# to unmount after finish the work.
 mount -t proc none /proc
 mount --bind sys /sys
 mount --bind etc /etc
-... # Forget...
-# Add DNS if using apt-get
+... # missing...
+# add DNS if using apt-get
 echo "202.5.5.5" > etc/hostname  # Ali public DNS
-# Modify thems related?
+# Modify themes of bootstrap?
 cd os.linux/lib/plymouth/themes/
-# When finishing, save it into iso.linux/casper
-# Only one filesystem.squashfs in casper/
+# when finish, save it into iso.linux/casper
+# only one filesystem.squashfs in casper/
 cd os && mksquashfs os.linux iso.linux/casper/filesystem.squashfs
 
-# Modify initrd.lz
-# We use 7z
+# modify initrd.lz
+# We cae use 7z to extract it.
 apt-get install p7zip-full
 # cd into casper
 cd os/iso.linux/casper
 7z x initrd.lz
-# Create a tmp file to save initrd file
+# create a tmp file to save initrd file
 mkdir TMP && cd TMP && cpio -i < ../initrd
 # U can try modify themes?
 cd lib/plymouth/themes
-# When finishing, save to initrd.lz
+# when finish, save to initrd.lz
 find . | cpio -o -H newc | lzma -7 > ../initrd.lz
-# Delete tmp files
+# delete tmp files
 cd .. && rm -rf TMP initrd
-```
+~~~
 
-####Make custom-made system into iso
-```bash
-# In iso.linux, using the following shell script
-# I using #genisoimage in my debian-xfce
-# Maybe using #mkisofs
+## Repackage into iso
+
+~~~bash
+# In iso.linux, execute the following shell script.
+# I use #genisoimage in my debian-xfce or it should be #mkisofs.
 # $start shell script
 #!/bin/sh
 NAME=$1
@@ -104,13 +104,12 @@ isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot \
 -boot-load-size 4 -boot-info-table -o ../$NAME.iso .
 # $end shell script
 cd iso.linux && sh genisoimage.sh my_linux.iso
-# DOWN! You can see a new my_linux.iso in os
-```
+# DOWN! You can see a new my_linux.iso in os.
+~~~
 
-####Task
+## Tasks
 
 - Try docker
-- Explorer chroot
+- Explore chroot
 - Try `mksquashfs os.my_debian iso.debian/casper/filesystem.squashfs`
-- U must prepare the following exams...... Orz
 

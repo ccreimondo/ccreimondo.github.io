@@ -9,10 +9,10 @@ categories: howto nginx
 - 探索 nginx mail proxy feature.
 - Gitlab CE 安装。
 
-##Target
+## Target
 Browser <--HTTP--> PS (Public Server with Nginx) <--HTTP--> LS (Local Server with Gitlab, Nginx bundled)
 
-##Problem 0x00
+## Problem 0x00
 登陆请求一直返回`422 Unprocessable Entity`. 页面提示**422 The change you requested was rejected.**
 翻翻 `gitlab-rails/production.log` 看到 `Can't verify CSRF token authenticity`. What's CSRF? See [csrf@wooyun](http://wiki.wooyun.org/web:csrf).
 
