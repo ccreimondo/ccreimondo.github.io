@@ -6,11 +6,11 @@ categories: notes ds
 ---
 
 ## Primitive Variables
-Single variabel & pointer.
+Single variable & pointer.
 
 
 ## Arrays
-A list of a fixed length.
+A list with a fixed length.
 
 ### Advantages
 - A perfect data structure to hold the individual values.
@@ -35,8 +35,8 @@ A linked list is a data structure that can hold an arbitrary number of data item
 First In First Out (FIFO)
 
 ### Methods
-- enqueued
-- dequeued
+- enqueue
+- dequeue
 
 ### Cases
 - Breadth-First Search (BFS)
@@ -50,10 +50,7 @@ Last In First Out (LIFO)
 
 
 ## Tree
-Trees are a data structure consisting of one or more data nodes.
-
-### Cases
-- XML document
+Tree is a data structure consisting of one or more data nodes.
 
 
 ## Binary Tree
@@ -62,6 +59,7 @@ A special type of tree is a binary tree \- each node has, at most, two children.
 ### Advantages
 - One of the most efficient ways to store and read a set of records that can be indexed by a key value in some way.
 - Be preferable to an array of values that has been sorted \- adding an arbitrary item to a sorted array requires some time-consuming reorganization of the existing data in order to maintain the desired ordering.
+
 
 ## Priority Queue
 Simply put, a priority queue accepts states, and internally stores them in a method such that it can quickly pull out the state that has the least cost.
