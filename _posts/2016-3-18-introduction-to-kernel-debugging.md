@@ -19,7 +19,7 @@ categories: notes linux
 
 图中，我选择Port Mode为TCP并自定义了一个端口9999，这样该虚拟串口便监听在*:9999。在GDB中，我们可以通过命令`target remote <host ip>:9999`连上该串口并对内核进行调试。
 
-Ubuntu Server x86版本足够满足我们的需求。安装系统过程中，我们一律下一步下一步即可（问及是否加密home?选否即可）。当然，我们需要留意一下时区、账户密码等信息。在Software Selection一页，记得勾选一个`OpenSSH Server`.
+Ubuntu Server x86版本足够满足我们的需求。安装系统过程中，我们一律下一步下一步即可（问及是否加密home?选否即可）。当然，我们需要留意一下时区、账户密码等信息。在Software Selection一页，记得勾选一个OpenSSH Server.
 
 ## 安装一些工具
 在Ubuntu里，我们可以通过`apt-get install <package name>`安装一些软件。
@@ -35,7 +35,7 @@ Ubuntu Server x86版本足够满足我们的需求。安装系统过程中，我
 - 当然，我们可以直接`make menuconfig`，它也会产生一个配置文件（如果源码根目录存在`.config`，它默认打开该配置文件），但编译耗时很长。
 - 最后，我们可以`make localmodconfig`获得一个与当前系统环境相关的简单的配置文件。期间，我们需要根据提示进行几个选择（基本上直接No）。综上，这个方式挺友好。
 
-`make -j [processor count] > /dev/null`进行编译。`-j`用于指定GCC衍生出的`worker`数量。这样，我们可以充分利用多核环境，进行并行编译以提高编译速度。`>/dev/null`可以帮助我们隐去大量编译过程信息，当然，warning、error之类的信息仍会保留。
+`make -j [processor count] > /dev/null`进行编译。`-j`用于指定GCC衍生出的worker数量。这样，我们可以充分利用多核环境，进行并行编译以提高编译速度。`>/dev/null`可以帮助我们隐去大量编译过程信息，当然，warning、error之类的信息仍会保留。
 
 ## 安装内核和配置GRUB
 - `make install`会将`.config`、编译生成的`vmlinuz`拷贝到系统`/boot`目录下。
