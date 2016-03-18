@@ -15,7 +15,7 @@ categories: notes linux
 
 ## 虚拟机配置和系统安装
 虚拟机为VirtualBox. 创建虚拟机的过程中，我们可以选择最少的硬件（但需要一块网卡，可以取消Audio之类的硬件），同时添加一个串口设备以供KGDB使用。添加串口设备：
-![virtualbox-serial-port-configurations](http://localhost:4000/images/blog/virtualbox-serial-port-configurations.png)
+![virtualbox-serial-port-configurations](http://blog.reimondo.org/images/blog/virtualbox-serial-port-configurations.png)
 
 图中，我选择Port Mode为TCP并自定义了一个端口9999，这样该虚拟串口便监听在*:9999。在GDB中，我们可以通过命令`target remote <host ip>:9999`连上该串口并对内核进行调试。
 
