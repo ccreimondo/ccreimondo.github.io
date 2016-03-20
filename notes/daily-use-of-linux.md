@@ -1,7 +1,6 @@
-Inputs
-===
+# Daily Use of Linux
 
-##Ultimate Process Command
+## Ultimate Process Command
 ```
 pkill -9 [fname]
 # Equal to
@@ -11,7 +10,7 @@ ps -ef | grep [fname] | awk '{print $2}' | xargs kill -9
 # Equal to
 ```
 
-##Find Linux Distribution
+## Find Linux Distribution
 ```
 # Universal
 cat /etc/os-release
@@ -28,6 +27,6 @@ cat /etc/redhat-release
 cat /etc/centos-release
 ```
 
-##Linux Help
+## References
 - [Debian official wiki](https://wiki.debian.org)
 - [CentOS](http://www.centos.org/docs/5/html/5.2/Deployment_Guide/)
