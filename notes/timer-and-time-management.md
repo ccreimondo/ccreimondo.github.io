@@ -186,9 +186,12 @@ static __always_inline int read_seqretry(const seqlock_t *sl, unsigned start)
 }
 ```
 
-readers`read_seqbegin`只读取`sequence`值，不会持有`spinlock`。`spinlock`只用于writers之间。readers通过比对前后`sequence`来确定要读的数据是否有修改，不同就再一次（循环）。其中，在`read_seqbegin`中，`unlikely(ret & 1)`表示要访问的数据正在被writer修改。`sequence`（default=0）如果是奇数，表示writer进行了写操作，如果是偶数，表示没writer进行数据修改操作。上述源码中，还有一个`smp_wmb`(Symmetric Multprocessing, Write Memory Barrier)和`smp_rmb`(...Read Memory Barrier)。什么是Memory Barrier？
+readers`read_seqbegin`只读取`sequence`值，不会持有`spinlock`。`spinlock`只用于writers之间。readers通过比对前后`sequence`来确定要读的数据是否有修改，不同就再一次（循环）。其中，在`read_seqbegin`中，`unlikely(ret & 1)`表示要访问的数据正在被writer修改。`sequence`（default=0，writer写前`++sequence`，写完后`++sequence`）如果是奇数，表示writer正在进行数据修改，如果是偶数，表示没writer进行数据修改操作。上述源码中，还有一个`smp_wmb`(Symmetric Multprocessing, Write Memory Barrier)和`smp_rmb`(...Read Memory Barrier)。什么是Memory Barrier？
 
 >内存屏障,也称内存栅栏，内存栅障，屏障指令等， 是一类同步屏障指令，是CPU或编译器在对内存随机访问的操作中的一个同步点，使得此点之前的所有读写操作都执行后才可以开始执行此点之后的操作。语义上，内存屏障之前的所有写操作都要写入内存；内存屏障之后的读操作都可以获得同步屏障之前的写操作的结果。因此，对于敏感的程序块，写操作之后、读操作之前可以插入内存屏障。    See [内存屏障](https://zh.wikipedia.org/wiki/%E5%86%85%E5%AD%98%E5%B1%8F%E9%9A%9C)
+
+为什么需要内存屏障？TODO
+那`smp_rmb`和`smp_wmb`有什么区别？TODO
 
 
 ## Timers
