@@ -1,15 +1,26 @@
 # Tips on C Programming in Linux Kernel
 
 
-## Declaring and Defining Varibles 
+## Declaring and Defining
 
 ### `extern`
+用于声明，其后的变量或函数可能在当前文件或其它文件中定义。形如`int i = 10;`为定义且声明且初始化。
 
 ### `static`
 
 ### `volatile`
 关于`volatile`, Documentation/volatile-considered-harmful.txt 里面有这样的描述:
 >C程序员通常认为volatile表示某个变量可以在当前执行的线程之外被改变；因此，在内核中用到共享数据结构时，常常会有C程序员喜欢使用volatile这类变量。换句话说，他们经常会把volatile类型看成某种简易的原子变量，当然它们不是。。。
+
+### `asm`
+- asm [volatile](“code template”:outputs:inputs:clobbers);
+
+```c
+/* e.g. */
+asm (“foo %1, %0”
+	: “=r” (output)
+	: “r” (input1), “0” (input2));
+```
 
 ## Bitwise Operatiors and Operations
 
