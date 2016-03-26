@@ -49,12 +49,12 @@ struct list_head {
 	container_of(ptr, type, member)
 ```
 
-- `offsetof(TYPE, MEMBER)`中`&((TYPE *)0)->MEMBER`为type中member在type中的偏移量（address_of(member) - address_of(type)(=0 as (type *)0) = address_of(member）。然后在`container_of`中，member的实际地址减去member在type中的偏移量，自然就是type变量的实际地址。
-- 0在`(type *)0`中表示什么?见上代码段中，0即NULL，是一个无内容的指针变量。`(type *)0`即`(type *)((void *)0)`。不这样（即没有一个合法的变量），就没法访问MEMBER，更没法`typeof()`了。
+- `offsetof(TYPE, MEMBER)`中`&((TYPE *)0)->MEMBER`是｀((TYPE *)0)->MEMBER`在`(TYPE *)0)`中的地址。为什么`((size_t) &((TYPE *)0)->MEMBER)`直接得出`((TYPE *)0)->MEMBER`在`(TYPE *)0`中的偏移量？`(TYPE *)0`的地址为0，所以。。。
+- 0在`(type *)0`中表示什么?见上代码中的NULL的定义，0即NULL（好像逻辑有点不对，明明`#define NULL 0`），一个值为0的指针变量。`(type *)0`即`(type *)((void *)0)`。不这样（即没有一个合法的变量），就没法访问MEMBER，更没法`typeof()`了。
 - `typeof()`如何工作？`sizeof()`呢？TODO
 - `offsetof`中`&((TYPE) *)0)->MEMBER`为什么需要转为`size_t`?`(char *)__mptr`为什么需要转换为`char *`？
 - 为什么不能`typeof(ptr) __mptr = ptr`，而要`typeof(((type *)0)->member) *__mptr = (ptr)`?我猜，指针只是单纯保存某变量的内存地址，无法体现变量的具体类型。
-- 为什么不直接`(ptr) - offsetof(type, member)`？`const typeof( ((type *)0)->member ) *__mptr = (ptr)`可以让编译器在编译时检查（ptr）的是否符合指定指针类型。
+- 为什么不直接`(ptr) - offsetof(type, member)`？`const typeof( ((type *)0)->member ) *__mptr = (ptr)`可以让编译器在编译时检查（ptr）是否符合指定指针类型(即是否是typeof((type *)0)->member))。这里，我们会把(ptr)转化为(char *)，如果不做类型检查，则无论ptr是什么都会编译通过。
 
 ## `list_for_each` and `list_for_each_entry`
 
