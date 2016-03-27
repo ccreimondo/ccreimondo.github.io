@@ -17,9 +17,6 @@ Linux启动过程中，借住BIOS构建物理地址映射。内核代码（text�
 ### Try to Trace Process Kernel Stack
 
 
-## Process-covered Files
-
-
 ## Process Descriptor
 这里简单的看一看 `task_struct`. 可以认为以下是进程管理所需要的基本元素。
 
@@ -101,9 +98,7 @@ pid_t tgid;
 typedef struct {
 	volatile int counter;
 } atomic_t;
-```
 
-```c
 /* include/linux/pid_namespace.h */
 struct pidmap {
        atomic_t nr_free;
@@ -129,6 +124,36 @@ Related source files:
 - kernel/pid_namespace.c
 - kernel/pid.c
 
+
+## `thread_info`
+内核将笨重且须频繁修改的`task_struct`丢在动态内存中，而在内核的内存区维护一个简洁的`thread_info`（52Byte），它存有指向`task_struct`的指针。内核将`thread_info`和当前进程的内核栈绑在一起（丢在两个连续的页中，`thread_info`从低地址开始，而栈开始于高地址）。这样，内核可以借助esp快速获取`task_struct`的指针（屏蔽esp的低位可获得当前所分配页的低地址，即`thread_info`的地址）。current宏工作方式就是如此：
+
+```c
+/* x86/include/asm/page_32_type.h */
+#ifdef CONFIG_4KSTACKS
+#define THREAD_ORDER	0
+#else
+#define THREAD_ORDER	1
+#endif
+#define THREAD_SIZE 	(PAGE_SIZE << THREAD_ORDER) /* PAGE_SIZE = 2^12 in 4KB PAGE. THREAD_SIZE = 2^13 for 8KBSTACKS */
+
+/* asm-generic/current.h */
+#define get_current() (current_thread_info()->task)
+#define current get_current()
+
+/* x86/include/asm/thread_info.h */
+/* how to get the current stack pointer from C */
+register unsigned long current_stack_pointer asm("esp") __used;
+
+/* how to get the thread information struct from C */
+static inline struct thread_info *current_thread_info(void)
+{
+	return (struct thread_info *)
+		(current_stack_pointer & ~(THREAD_SIZE - 1)); /* ~(THREAD_SIZE - 1) = 0xfffff000 */
+}
+```
+
+`%esp`与0xfffff000后便是`thread_info`的地址。
 
 ## References
 1. Daniel P. Bovet, Marco Cesati. Understanding the Linux Kernel, 3rd Edition.
