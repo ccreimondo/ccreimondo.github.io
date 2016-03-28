@@ -12,10 +12,6 @@ Linux启动过程中，借住BIOS构建物理地址映射。内核代码（text�
 线性地址以0xc0000000分界，低地址为内核态进程可寻址空间。内核创建并维护自己的页表（master kernel PGD)。
 借助这些页中的数据，内核便可进行线性地址到物理地址的转换。
 
-### Allocating the Process Descriptor
-
-### Try to Trace Process Kernel Stack
-
 
 ## Process Descriptor
 这里简单的看一看 `task_struct`. 可以认为以下是进程管理所需要的基本元素。
@@ -38,6 +34,11 @@ Linux启动过程中，借住BIOS构建物理地址映射。内核代码（text�
 /* bitmask of tsk->exit_state */
 #define EXIT_ZOMBIE		16
 #define EXIT_DEAD		32
+
+/* state variable in `task_struct` */
+
+volatile long state;	/* -1 unrunnable, 0 runnable, >0 stopped */
+int exit_state;
 ```
 - `TASK_RUNNING`: 进程是可执行的；它或者执行，或者等待执行。
 - `TASK_INTERRUPTIBLE`: 进程正在睡眠，即被阻塞，等待某些条件的达成。
@@ -47,13 +48,6 @@ Linux启动过程中，借住BIOS构建物理地址映射。内核代码（text�
 - `EXIT_ZOMBIE`: 进程执行被终止，但是，父进程还没有发布 `wait4()` 或 `waitpid()` 系统调用来
 返回有关死亡进行的信息。
 - `EXIT_DEAD`: 最终状态，由于父进程刚发出 `wait4()` or `waitpid()` 系统调用，因而进程由系统删除。
-
-```c
-/* state variable in `task_struct` */
-
-volatile long state;	/* -1 unrunnable, 0 runnable, >0 stopped */
-int exit_state;
-```
 
 ### Relationships Among Processes
 Linux 系统的进程之间存在一个明显的进程关系。
@@ -91,7 +85,7 @@ pid_t tgid;
 - `tgid`: Thread Group ID, 该P所在线程组中第一个LWP的PID。一般进程只有一个线程，`tgid`与`pid`
 相同。`getpid()`返回`tgid`的值。
 
->由于循环使用 PID 编号，内核必须通过管理一个pidmap-array位图来表示当前已分配的PID号和闲置的PID号。因为一个页框包含32768个位，所以32位体系结构中pidmap-array位图存放在一个单独的页中。。。			*《深入理解 LINUX 内核 第三版》P.88-89*
+#### `pidmap`
 
 ```c
 /* linux/types.h */
@@ -99,7 +93,7 @@ typedef struct {
 	volatile int counter;
 } atomic_t;
 
-/* include/linux/pid_namespace.h */
+/* linux/pid_namespace.h */
 struct pidmap {
        atomic_t nr_free;
        void *page;
@@ -118,15 +112,19 @@ struct pid_namespace {
 };
 ```
 
-Related source files:
-- include/linux/pid_namespace.h
-- include/linux/pid.h
-- kernel/pid_namespace.c
-- kernel/pid.c
+由于循环使用PID编号，内核必须通过管理一个pidmap-array位图来表示当前已分配的PID号和闲置的PID号。因为一个页框包含32768个位，所以32位体系结构中pidmap-array位图存放在一个单独的页中。
+
+### Hardware Context and `struct thread_struct thread`
+#### Hardare Context
+- PC & SP
+- GPRs, General Purpose Registers
+- FRs, Float Registers
+- PCRs, Processor Control Registers (containing information about the CPU state)
+- MMRs, Memory Management Registers
 
 
 ## `thread_info`
-内核将笨重且须频繁修改的`task_struct`丢在动态内存中，而在内核的内存区维护一个简洁的`thread_info`（52Byte），它存有指向`task_struct`的指针。内核将`thread_info`和当前进程的内核栈绑在一起（丢在两个连续的页中，`thread_info`从低地址开始，而栈开始于高地址）。这样，内核可以借助esp快速获取`task_struct`的指针（屏蔽esp的低位可获得当前所分配页的低地址，即`thread_info`的地址）。current宏工作方式就是如此：
+内核将笨重且须频繁修改的`task_struct`丢在动态内存中，而在内核的内存区维护一个简洁的`thread_info`（52Byte），它存有指向`task_struct`的指针。内核将`thread_info`和当前进程的内核栈（进程的运行需要一个栈来保存参数等信息，处于内核态的进程有自己的内核栈）绑在一起（丢在两个连续的页中，`thread_info`从低地址开始，而栈开始于高地址）。这样，内核可以借助esp快速获取`task_struct`的指针（屏蔽esp的低位可获得当前所分配页的低地址，即`thread_info`的地址）。current宏工作方式就是如此：
 
 ```c
 /* x86/include/asm/page_32_type.h */
@@ -154,6 +152,7 @@ static inline struct thread_info *current_thread_info(void)
 ```
 
 `%esp`与0xfffff000后便是`thread_info`的地址。
+
 
 ## References
 1. Daniel P. Bovet, Marco Cesati. Understanding the Linux Kernel, 3rd Edition.

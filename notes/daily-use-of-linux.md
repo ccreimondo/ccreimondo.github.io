@@ -1,32 +1,41 @@
-# Daily Use of Linux
+# Daily Use of Linux with CLI
+
+## File Operations
+
+```bash
+```
 
 ## Ultimate Process Command
-```
+
+```bash
 pkill -9 [fname]
-# Equal to
+# equal to
 pgrep [fname] | xargs kill -9
 
 ps -ef | grep [fname] | awk '{print $2}' | xargs kill -9
-# Equal to
+# equal to
 ```
 
-## Find Linux Distribution
-```
-# Universal
+
+## Check Linux Distribution
+
+```bash
+# universal
 cat /etc/os-release
 
-# Debian
+# debian
 cat /etc/debian_version
 
-# Ubuntu
+# ubuntu
 lsb_release
 cat /etc/lsb_release
 
-# Redhat|CentOS
+# redhat or centos
 cat /etc/redhat-release
 cat /etc/centos-release
 ```
 
+
 ## References
-- [Debian official wiki](https://wiki.debian.org)
+- [Debian Official Wiki](https://wiki.debian.org)
 - [CentOS](http://www.centos.org/docs/5/html/5.2/Deployment_Guide/)
