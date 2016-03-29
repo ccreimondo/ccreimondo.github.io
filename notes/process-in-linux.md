@@ -1,22 +1,8 @@
 # Process in Linux
-进程定义为程序执行的实例。操作系统需要借助它保存正在执行的程序的实时数据。
+`task_struct`中一些变量的解析。
 
 
-## Memory Architecture of Process
-
-### Paging
-Linux采用四级分页模型（PGD, [PUD, PMD,] PT)。其中页大小取决于线性地址中的offset位数，典型的，Linux使用12bits，即页大小为4KB。
-
-### Setup Memory
-Linux启动过程中，借住BIOS构建物理地址映射。内核代码（text）、数据（data）占据物理内存前3MB RAM（包括保留空间）。
-线性地址以0xc0000000分界，低地址为内核态进程可寻址空间。内核创建并维护自己的页表（master kernel PGD)。
-借助这些页中的数据，内核便可进行线性地址到物理地址的转换。
-
-
-## Process Descriptor
-这里简单的看一看 `task_struct`. 可以认为以下是进程管理所需要的基本元素。
-
-### State
+## Process State
 
 ```c
 /* bitmask of tsk->state */
@@ -49,7 +35,8 @@ int exit_state;
 返回有关死亡进行的信息。
 - `EXIT_DEAD`: 最终状态，由于父进程刚发出 `wait4()` or `waitpid()` 系统调用，因而进程由系统删除。
 
-### Relationships Among Processes
+
+## Relationships Among Processes
 Linux 系统的进程之间存在一个明显的进程关系。
 
 ```
@@ -72,10 +59,10 @@ struct task_struct *group_leader;	/* threadgroup leader */
 - `sibling`: 指向兄弟进程链表中的下一个（前一个）的指针，这些兄弟进程的父进程为P。
 - `group_leader`: 指向P所在线程组领头线程的描述符。
 
->特别的，一个进程可能是一个进程组或者登录会话的领头进程，也可能是一个线程组的领头进程，它还可以跟踪其他进程的执行。		*《深入理解 LINUX 内核 第三版》P.96*
+>特别的，一个进程可能是一个进程组或者登录会话的领头进程，也可能是一个线程组的领头进程，它还可以跟踪其他进程的执行。
 
-### PID
-PID 用于标示进程。它在`task_struct`中的相关变量:
+## PID
+类Unix系统允许用户使用PID标示进程（系统自己用`struct task_struct *`）。PID在`task_struct`中的相关变量:
 
 ```c
 pid_t pid;
@@ -85,7 +72,7 @@ pid_t tgid;
 - `tgid`: Thread Group ID, 该P所在线程组中第一个LWP的PID。一般进程只有一个线程，`tgid`与`pid`
 相同。`getpid()`返回`tgid`的值。
 
-#### `pidmap`
+### `pidmap`
 
 ```c
 /* linux/types.h */
@@ -114,8 +101,9 @@ struct pid_namespace {
 
 由于循环使用PID编号，内核必须通过管理一个pidmap-array位图来表示当前已分配的PID号和闲置的PID号。因为一个页框包含32768个位，所以32位体系结构中pidmap-array位图存放在一个单独的页中。
 
-### Hardware Context and `struct thread_struct thread`
-#### Hardare Context
+
+## Hardware Context and `struct thread_struct thread`
+### Hardare Context
 - PC & SP
 - GPRs, General Purpose Registers
 - FRs, Float Registers
