@@ -9,6 +9,7 @@ struct list_head {
 };
 ```
 
+
 ## `container_of` and `list_entry`
 
 ```c
@@ -100,6 +101,25 @@ struct list_head {
  * spin_lock_prefetch(x) - prefetches the spinlock *x for taking
  */
 ```
+
+## `hlist_head` & `hlist_node`
+
+```c
+struct hlist_head {
+	struct hlist_node *first;
+};
+
+struct hlist_node {
+	struct hlist_node *next, **pprev;
+};
+```
+
+这个相比于前一种链表的实现，不同点有：
+- 多维护了一个`hlist_head`，且该结构体中只有一个指针。
+- `**pprev`指向前一个`hlist_node`的`&next`。它为什么不直接指向`hlist_node`？因为链表中，有一个特别的结构`hlist_head`，`struct hlist_node *prev`拿它没办法，但每个结构题中都一个`struct hlist_node *`，所以采用`struct hlist_node **pprev`。
+
+hlist专为hash table设计（hlist中的h是不是就是hash？）。只有一个成员的`hlist_head`相比有两个成员的`list_head`，在hash table中占用更小空间的slot，这样，固定大小的hash table可以多一倍的slots。为什么不在slot里面存一个指向链表某个node的指针呢？TODO
+
 
 ## References
 - [Why this 0 in ((type*)0)->member in C?](http://stackoverflow.com/questions/13723422/why-this-0-in-type0-member-in-c)

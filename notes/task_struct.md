@@ -1,4 +1,4 @@
-# Process in Linux
+# Task Struct
 `task_struct`中一些变量的解析。
 
 
@@ -70,7 +70,7 @@ pid_t tgid;
 ```
 
 - `tgid`: Thread Group ID, 该P所在线程组中第一个LWP的PID。一般进程只有一个线程，`tgid`与`pid`
-相同。`getpid()`返回`tgid`的值。
+相同。对于一个多线程的进程，每个线程都会分配自己的`pid`，但`tgid`一定相同。`getpid()`返回`tgid`的值。
 
 ### `pidmap`
 
@@ -101,6 +101,9 @@ struct pid_namespace {
 
 由于循环使用PID编号，内核必须通过管理一个pidmap-array位图来表示当前已分配的PID号和闲置的PID号。因为一个页框包含32768个位，所以32位体系结构中pidmap-array位图存放在一个单独的页中。
 
+### `struct pid_link pids[PIDTYPE_MAX]`
+为了快速完成PID->`task_struct`的映射，内核维护了几张哈希表。PID作为key，表值是个`hlink_head`。hash table的入口在哪里？TODO
+
 
 ## Hardware Context and `struct thread_struct thread`
 ### Hardare Context
@@ -109,6 +112,69 @@ struct pid_namespace {
 - FRs, Float Registers
 - PCRs, Processor Control Registers (containing information about the CPU state)
 - MMRs, Memory Management Registers
+
+###`struct thread_struct thread` in `task_struct`
+
+```c
+/* x86/include/asm/processor.h */
+struct thread_struct {
+	/* Cached TLS descriptors: */
+	struct desc_struct	tls_array[GDT_ENTRY_TLS_ENTRIES];
+	unsigned long		sp0;
+	unsigned long		sp;
+#ifdef CONFIG_X86_32
+	unsigned long		sysenter_cs;
+#else
+	unsigned long		usersp;	/* Copy from PDA */
+	unsigned short		es;
+	unsigned short		ds;
+	unsigned short		fsindex;
+	unsigned short		gsindex;
+#endif
+#ifdef CONFIG_X86_32
+	unsigned long		ip;
+#endif
+#ifdef CONFIG_X86_64
+	unsigned long		fs;
+#endif
+	unsigned long		gs;
+	/* Hardware debugging registers: */
+	unsigned long		debugreg0;
+	unsigned long		debugreg1;
+	unsigned long		debugreg2;
+	unsigned long		debugreg3;
+	unsigned long		debugreg6;
+	unsigned long		debugreg7;
+	/* Fault info: */
+	unsigned long		cr2;
+	unsigned long		trap_no;
+	unsigned long		error_code;
+	/* floating point and extended processor state */
+	union thread_xstate	*xstate;
+#ifdef CONFIG_X86_32
+	/* Virtual 86 mode info */
+	struct vm86_struct __user *vm86_info;
+	unsigned long		screen_bitmap;
+	unsigned long		v86flags;
+	unsigned long		v86mask;
+	unsigned long		saved_sp0;
+	unsigned int		saved_fs;
+	unsigned int		saved_gs;
+#endif
+	/* IO permissions: */
+	unsigned long		*io_bitmap_ptr;
+	unsigned long		iopl;
+	/* Max allowed port in the bitmap, in bytes: */
+	unsigned		io_bitmap_max;
+/* MSR_IA32_DEBUGCTLMSR value to switch in if TIF_DEBUGCTLMSR is set.  */
+	unsigned long	debugctlmsr;
+	/* Debug Store context; see asm/ds.h */
+	struct ds_context	*ds_ctx;
+};
+```
+
+## context switch & `switch_to`
+TODO
 
 
 ## `thread_info`

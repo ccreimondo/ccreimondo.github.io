@@ -13,7 +13,8 @@
 >C程序员通常认为volatile表示某个变量可以在当前执行的线程之外被改变；因此，在内核中用到共享数据结构时，常常会有C程序员喜欢使用volatile这类变量。换句话说，他们经常会把volatile类型看成某种简易的原子变量，当然它们不是。。。
 
 ### `asm`
-- asm [volatile](“code template”:outputs:inputs:clobbers);
+- asm [volatile](“code template”:outputs:inputs:clobbers)
+- volatile指明编译器不优化这些汇编指令
 
 ```c
 /* e.g. */
@@ -21,6 +22,12 @@ asm (“foo %1, %0”
 	: “=r” (output)
 	: “r” (input1), “0” (input2));
 ```
+
+
+##`sizeof`
+- `sizeof(struct struct_type)`:
+- `sizeof(pointer)`:
+
 
 ## Bitwise Operatiors and Operations
 
