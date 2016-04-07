@@ -21,7 +21,7 @@ TODD
 `clone()`指glibc封装的syscall，用于创建轻量级进程，`sys_clone()`是clone系统调用的内核实现函数。在参数上，sys_clone没有了clone中的fn、arg参数。sys_clone作为内核例程只需要相应的参数为新子进程分配必要的资源（PID、进程描述符、thread_info等内核数据结构）并丢到相应的队列，这些参数为FLAGS、子进程在用户空间的SP。
 
 
-## `fork()`->`sys_fork()`->`do_fork()` vs `fork()`->`clone()`->`sys_clone()`->`do_fork()`
+## `sys_fork()` vs `sys_clone()`
 
 ```c
 int sys_fork(struct pt_regs *regs)

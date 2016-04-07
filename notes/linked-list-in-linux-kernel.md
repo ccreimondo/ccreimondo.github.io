@@ -52,7 +52,7 @@ struct list_head {
 
 - `offsetof(TYPE, MEMBER)`中`&((TYPE *)0)->MEMBER`是｀((TYPE *)0)->MEMBER`在`(TYPE *)0)`中的地址。为什么`((size_t) &((TYPE *)0)->MEMBER)`直接得出`((TYPE *)0)->MEMBER`在`(TYPE *)0`中的偏移量？`(TYPE *)0`的值为0（一个为NULL的指针无条件返回0），所以。。。
 - 0在`(type *)0`中表示什么?见上代码中的NULL的定义，0即NULL（好像逻辑有点不对，明明`#define NULL 0`），一个值为0的指针变量（可以程序`printf("%d\n", (int)NULL)`验证一下）。`(type *)0`即`(type *)((void *)0)`。不这样（即没有一个合法的(type *)变量），就没法访问MEMBER，更没法`typeof()`了。
-- `typeof()`如何工作？`sizeof()`呢？TODO
+- `typeof()`如何工作？`sizeof()`呢？
 - `offsetof`中`&((TYPE) *)0)->MEMBER`为什么需要转为`size_t`?`(char *)__mptr`为什么需要转换为`char *`？
 - 为什么不能`typeof(ptr) __mptr = ptr`，而要`typeof(((type *)0)->member) *__mptr = (ptr)`?我猜，指针只是单纯保存某变量的内存地址，无法体现变量的具体类型。
 - 为什么不直接`(ptr) - offsetof(type, member)`？`const typeof( ((type *)0)->member ) *__mptr = (ptr)`可以让编译器在编译时检查（ptr）是否符合指定指针类型(即是否是typeof((type *)0)->member))。这里，我们会把(ptr)转化为(char *)，如果不做类型检查，则无论ptr是什么都会编译通过。
@@ -118,7 +118,7 @@ struct hlist_node {
 - 多维护了一个`hlist_head`，且该结构体中只有一个指针。
 - `**pprev`指向前一个`hlist_node`的`&next`。它为什么不直接指向`hlist_node`？因为链表中，有一个特别的结构`hlist_head`，`struct hlist_node *prev`拿它没办法，但每个结构题中都一个`struct hlist_node *`，所以采用`struct hlist_node **pprev`。
 
-hlist专为hash table设计（hlist中的h是不是就是hash？）。只有一个成员的`hlist_head`相比有两个成员的`list_head`，在hash table中占用更小空间的slot，这样，固定大小的hash table可以多一倍的slots。为什么不在slot里面存一个指向链表某个node的指针呢？TODO
+hlist专为hash table设计（hlist中的h是不是就是hash？）。只有一个成员的`hlist_head`相比有两个成员的`list_head`，在hash table中占用更小空间的表项。这样，固定大小的hash table可以多一倍的表项。为什么不在slot里面存一个指向链表某个node的指针呢？其实hlist_head本质上就是封装了一个指向链表的指针。pid_hash定义在kernel/pid.c: `static struct hlist_head *pid_hash;`。
 
 
 ## References
