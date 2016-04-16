@@ -1,1 +1,1 @@
-# Blog & Notes
+# entries
