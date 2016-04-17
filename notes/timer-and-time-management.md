@@ -171,7 +171,7 @@ void update_process_times(int user_tick)
 
 >update_curr() is invoked periodically by the system timer and also whenever a process becomes runnable or blocks, becoming unrunnable. 
 
-那么，是这里某个函数调用的吗？`scheduler_tick()`->update_rq_clock(rq)->TODO->`task_tick_fair()`->`update_curr()`。
+那么，是这里某个函数调用的吗？`scheduler_tick()`->update_rq_clock(rq)->`rq->clock_task`<-`update_curr()`。
 
 
 #### Sequential Lock vs Read-Write Spin Locks
