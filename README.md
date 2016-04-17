@@ -1,2 +1,1 @@
-# ccreimondo.github.io
-Blog & Notes.
+# Blog & Notes
