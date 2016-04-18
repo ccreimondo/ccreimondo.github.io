@@ -4,7 +4,7 @@ title:  "Try to Create a Linux ISO"
 date:   2015-1-10 13:33:11
 categories: howto linux
 ---
-This is just a scratch and I have just tried with Kubuntu...
+This is just a scratch and I tried with Kubuntu...
 
 ## Prepare
 
@@ -49,7 +49,7 @@ mv iso.linux/casper/filesystem.squashfs .
 unsquashfs -d os.linux filesystem.squashfs
 ~~~
 
-![os linux files](http://ccreimondo.github.io/images/blog/linux-mkiso-about-os-linux.png)
+![os linux files](http://blog.reimondo.org/images/blog/linux-mkiso-about-os-linux.png)
 
 ## Custom sth.
 
