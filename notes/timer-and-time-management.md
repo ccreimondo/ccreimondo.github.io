@@ -19,7 +19,8 @@
 
 
 ## Real-Time Clock and System Timer
-pass
+- RTC为独立硬件，用于维护时间。
+- System Timer用于定期产生全局时钟中断。
 
 
 ## Real-Time Clock
@@ -271,11 +272,11 @@ readers`read_seqbegin`只读取`sequence`值，不会持有`spinlock`。`spinloc
 
 
 ## Soft Timers
-How is it organized? TODO (@Zhiqiang He):
+详见ULK.CH6.软定时器。它们由TIMER_SOFTIRQ软中断执行。
 
 
 ## Related System Calls
-TODO
+用户态下的进程通过gettimeofday()读取时间和日期。
 
 ## How does command `time` calculate time (user、system)?
 TODO
