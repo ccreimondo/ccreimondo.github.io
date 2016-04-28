@@ -1,4 +1,4 @@
-# Memory Architecture in Linux
+# Memory Management
 
 ## Paging
 Linux采用四级分页模型（PGD, [PUD, PMD,] PT)。其中页大小取决于线性地址中的offset位数，典型的，Linux使用12bits，即页大小为4KB。

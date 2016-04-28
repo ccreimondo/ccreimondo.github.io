@@ -12,8 +12,8 @@ categories: notes linux
 其分别对应于UTC和ISO 8601. UTC是最主要的世界时间标准，且区分时区，e.g. 我们的本
 地时间即东八区(UTC+8). ISO 8601是日期和时间表示的国际标准。我们可以简单理解为
 它规定了时间中每部分的位数和分隔符号，e.g. YYYY-MM-DDTHH:MM:SSZ，其中T为合并日
-期和时间时的分隔字符，Z后缀表示该时间为UTC。写程序时，参考以上两个标准是有必要
-的。
+期和时间时的分隔字符，Z后缀表示该时间为UTC。我们写程序时，意识到以上两个标准是
+有必要的。
 
 
 ## UNIX时间和UTC
@@ -78,7 +78,8 @@ print curr_datetime.isoformat()
 # 2016-04-28T01:31:51.634795
 ~~~
 
-当然，我们完全可以自定义时间，然后调用`datetime.strftime(format)`.
+当然，我们完全可以自定义时间格式，然后调用`datetime.strftime(format)`得到我们
+想要的时间形式.
 
 
 ## References
