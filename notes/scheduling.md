@@ -32,7 +32,7 @@ PREEMPT_ACTIVE后再调用schedule()。
 
 以上原则告诉我们：只有当内核正在执行异常处理程序（尤其是系统调用），而且内核抢
 占没有被显示禁用时，才可能抢占内核。此外，本地CPU必须打开本地中断，否则无法完成
-内核抢占（这里的抢占内核就是指发生调度）。
+内核抢占（内核抢占指发生调度）。
 
 备注：preempt_count由四个字段组成，0～7为抢占计数器，8～15为软中断计数器，16～
 27为硬中断计数器，28为PREEMPT_ACTIVE标志。它们分别会在以下情况被修改：
@@ -88,7 +88,7 @@ release_kernel_lock()以释放BKL，当然只有lock_depth>=0时才会用真正�
 
 update_rq_clock()用于更新rq的clock。像CFS中，update_curr就会利用rq->clock进行时
 间记账。因为后面代码会对rq做一些数据修改，所以需要获取rq中的spin_lock，且这里
-用到的sping_lock_irq()既禁止本地中断又获取spin_lock以分别解决来自中断和SMP的并
+用到的spin_lock_irq()既禁止本地中断又获取spin_lock以分别解决来自中断和SMP的并
 发访问。
 
 ```c
@@ -153,7 +153,7 @@ pick_next_task选择下一个即将运行的进程且next指向该进程描述�
 
 ```
 
-尝试重为当前进程获取BKL，不成功则表示BKL已被持有，则再次进行调度。
+尝试重为当前进程获取BKL，不成功则表示BKL已被其它进程持有，则再次进行调度。
 
 ```c
         preempt_enable_no_resched();
@@ -234,7 +234,7 @@ prev->prev_mm为NULL。
         switch_to(prev, next, prev);
 ```
 
-通过witch_to()完成栈和寄存器的切换。此函数中，当前CPU会执行另一个进程。
+通过switch_to()完成栈和寄存器的切换。此函数中，当前CPU会执行另一个进程。
 
 ```c
         barrier();
@@ -247,11 +247,12 @@ prev->prev_mm为NULL。
 }
 ```
 
-这里，当程序重新被调度运行。barrier()产生一个代码优化屏障后执行
-finish_task_switch()主要在prev是内核线程时，恢复其active_mm，调用mmdrop减少其
-借用的地址空间的引用计数。如果，prev是否是一个正在从系统中被删除的僵尸任务，如
-果是就调用put_task_struct()以释放进程描述符引用计数器，并撤销所有其余对该进程
-的引用。
+这里，程序重新被调度运行。barrier()产生一个代码优化屏障后执行
+finish_task_switch()。prev是内核线程时，该函数恢复其active_mm，并调用mmdrop减
+少其借用的地址空间的引用计数。如果prev是一个正在从系统中被删除的僵尸任务，
+finish_task_switch()就调用put_task_struct()以释放进程描述符引用计数器，并撤销
+所有其余对该进程的引用。
+
 
 ## References:
 - 深入理解LINUX内核. 第3版.
