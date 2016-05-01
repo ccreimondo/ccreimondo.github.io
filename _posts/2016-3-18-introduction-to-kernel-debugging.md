@@ -2,6 +2,7 @@
 layout: post
 title:  "Introduction to Linux Kernel (v2.6) Debugging"
 date:   2016-3-18 00:00:00
+comments: true
 categories: notes linux
 ---
 慢慢填坑。
@@ -54,5 +55,5 @@ Ubuntu Server x86版本足够满足我们的需求。安装系统过程中，我
 - [Ubuntu 10.04 LTS Technical Overview](https://wiki.ubuntu.com/LucidLynx/TechnicalOverview)
 - [Linux 内核编译初学者指南](http://zhoutall.com/archives/635)
 - [使用 GDB 和 KVM 调试 Linux 内核与模块](http://www.ibm.com/developerworks/cn/linux/1508_zhangdw_gdb/index.html)
-- [Using kgdb, kdb and the kernel debugger internals](Using kgdb, kdb and the kernel debugger internals)
+- [Using kgdb, kdb and the kernel debugger internals](https://www.kernel.org/doc/htmldocs/kgdb/index.html)
 

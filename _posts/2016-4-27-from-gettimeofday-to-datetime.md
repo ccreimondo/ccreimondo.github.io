@@ -2,6 +2,7 @@
 layout: post
 title:  "Python Date & Time and gettimeofday() in Linux"
 date:   2016-4-27 00:00:00
+comments: true
 categories: notes linux
 ---
 
