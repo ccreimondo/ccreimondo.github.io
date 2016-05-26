@@ -46,7 +46,9 @@ static __always_inline void *kmalloc(size_t size, gfp_t flags)
 ```
 
 kmalloc有两个常用接口，void *kmalloc(size_t size, gfp_t flags)和
-void kfree(const void *objp)，分别用于请求和释放对象。其中，内核内存分配需要指定GFP (Get Free Page) flags。该flags被页框分配器用于区分页框所在区域。Kmalloc返回对象的指针。
+void kfree(const void *objp)，分别用于请求和释放对象。其中，内核内存分配需要指定
+GFP (Get Free Page) flags。该flags被页框分配器用于区分页框所在区域。Kmalloc返回对象的
+指针。
 
 ```c
 	if (__builtin_constant_p(size)) {
@@ -94,7 +96,8 @@ found:
 	}
 ```
 
-通常情况下，malloc创建了13个通用caches并保存在malloc_size数组里面。数组项类型为struct cache_sizes（后面会说）。若flags里面含有GFP_DMA标志，则cachep指向dmacachep。
+通常情况下，malloc创建了13个通用caches并保存在malloc_size数组里面。数组项类型为
+struct cache_sizes（后面会说）。若flags里面含有GFP_DMA标志，则cachep指向dmacachep。
 kmem_cache_alloc_notrace是slab分配器提供的接口，根据给定cachep返回一个空闲对象的指针。
 
 
@@ -152,7 +155,7 @@ static inline struct kmem_cache *__find_general_cachep(size_t size,
 		csizep++;
 ```
 
-csizep指向malloc_size数组。while循环遍历csizep寻找适合size的通用对象。最后，csizep指向
+csizep指向malloc_size数组。while循环遍历csizep寻找适合size的通用缓存。最后，csizep指向
 该数组项。
 
 
@@ -194,10 +197,53 @@ void kfree(const void *objp)
 EXPORT_SYMBOL(kfree);
 ```
 
-kfree用于释放objp指向的对象。virt_to_cache函数根据objp返回缓存对象。kfree调用
-__cache_free释放objp。kfree在释放一个对象之前做了一些检查，我们需要禁止本地中断保证
-这段代码的原子性。
+kfree用于释放objp指向的对象。virt_to_cache（后面细说）函数根据objp存的地址返回当前高速
+缓存描述符。kfree调用__cache_free释放objp。kfree在释放一个对象之前做了一些检查，我们需
+要禁止本地中断保证这段代码的原子性，即__cache_free时，检查依然是有效的。
 
+
+```c
+/* mm/slab.c */
+static inline struct kmem_cache *virt_to_cache(const void *obj)
+{
+	struct page *page = virt_to_head_page(obj);
+	return page_get_cache(page);
+}
+
+static inline struct kmem_cache *page_get_cache(struct page *page)
+{
+	page = compound_head(page);
+	BUG_ON(!PageSlab(page));
+	return (struct kmem_cache *)page->lru.next;
+}
+```
+
+Commpound page是连续页框联合的一种形式，可形成较大的页。一个commpound page中每个page描
+述符中的first_page指向第一个页框的描述符。compound_head函数可以帮助我们判断当前页是否属于
+commpound page并返回head page的描述符。通过读取页框描述符的lru.next字段，就可以确定出
+对应的高速缓存描述符地址。
+
+
+```c
+/* include/linux/mm.h */
+static inline struct page *virt_to_head_page(const void *x)
+{
+	struct page *page = virt_to_page(x);
+	return compound_head(page);
+}
+```
+
+virt_to_page(addr)宏产生线性地址addr对应的页描述符。结合上文，virt_to_page在这里返回
+obj所在页的描述符地址。
+
+```c
+/* arch/x86/include/asm/page.h */
+#define virt_to_page(kaddr)	pfn_to_page(__pa(kaddr) >> PAGE_SHIFT)
+```
+
+pfn_to_page(pfn)宏产生与页框号pfn对应的页描述符地址。__pa(kaddr)宏产生内核虚拟地址对应
+的物理地址。在x86_32上，它只要将kaddr减去0xc0000000(PAGE_OFFSET)。>> PAGE_SHIFT除去
+页内offset所用的bit，留下页帧号。
 
 ```c
 /* Size description struct for general caches. */
@@ -211,4 +257,5 @@ struct cache_sizes {
 extern struct cache_sizes malloc_sizes[];
 ```
 
-其中，每一个通用cache区分DMA和非DMA。Linux将一个内存节点分为三个区，DMA、NORMAL和HIGHMEM。DMA硬件可以直接访问DMA区。
+其中，每一个通用cache区分DMA和非DMA。Linux将一个内存节点分为三个区，DMA、NORMAL
+和HIGHMEM。DMA硬件可以直接访问DMA区。
