@@ -12,9 +12,9 @@ open()系统调用的服务例程为sys_open()函数，该函数接受的参数�
 作为通用文件模型，VFS抽象出superblock对象、inode对象（CSAPP称为vnode）、file对象和
 dentry对象：
 - superblock: 存放已安装文件系统的有关信息，e.g. 对应于fs控制块，sb.inodes为所有索引节点
-的链表;
-- inode: 存放关于具体文件的一般信息，e.g. 对应于EXT4的inode，inode.i_size为文件字节数;
-- dentry: 描述一个目录的信息。e.g. dentry.d_subdirs为子目录链表;
+的链表；
+- inode: 存放关于具体文件的一般信息，e.g. 对应于EXT4的inode，inode.i_size为文件字节数；
+- dentry: 描述一个目录的信息。e.g. dentry.d_subdirs为子目录链表；
 - file: 描述当前进程打开的文件的状态，e.g. file.f_pos记录位移量。
 当一个具体的磁盘文件系统被挂载和访问时，VFS会根据该磁盘文件系统中的信息（超级块和inode）
 在内存中构造出包含以上元素的更加丰满、高效和符合我们认知的文件系统。不同于磁盘中文件系统的
@@ -23,7 +23,7 @@ dentry对象：
 
 task_struct中与文件系统相关的变量有fs和files。fs维护着进程当前的根目录项和工作目录项，目
 录所在文件系统等信息。files维护着进程当前打开的文件对象，如图：
-![files_of_process](files_of_process.png)
+![files_of_process](images/files_of_process.png)
 若一个进程想打开一个文件，它便调用open系统调用。sys_open首先解析文件路径，如将/usr/src/
 linux/fs/open.c解析为/、usr、src、linux、fs和open.c。然后从current->fs中的root或pwd
 所标示的目录项开始搜索，直到找到open.c的目录项。dentry中有指向open.c的inode指针，inode
