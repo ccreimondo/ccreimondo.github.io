@@ -1,4 +1,5 @@
 # Completely Fair Scheduler
+Linux上主要有两大类调度算法,CFS(完全公平调度算法)和实时调度算法。宏SCHED_NOMAL主要用于CFS调度,而SCHED_FIFO和SCHED_RR主要用于实时调度。
 
 
 ## Task Traits
@@ -13,7 +14,9 @@ I/O bound or CPU bound.
 
 
 ## Load
-TODO
+- CPU load显示了CPU的负载情况，正常的范围为[0, NR_CPUS]。若CPU load > NR_CPUS，则当前
+机器有(cpu_load - NR_CPUS) * MAX_THROUGHPUT的进程处于等待。
+- cfs_rq和sched_entity中的load_weight指进程优先级所对应的权值。
 
 
 ## Time Accounting
@@ -177,7 +180,12 @@ struct sched_entity {
 static inline unsigned long
 calc_delta_fair(unsigned long delta, struct sched_entity *se)
 {
+	/* 若nice为0，此时load.weight = NICE_0_LOAD，即1024，则直接返回delta */
 	if (unlikely(se->load.weight != NICE_0_LOAD))
+		/*
+		 * 否则，delta *= NICE_0_LOAD/se->load.weigh，其中
+		 * load.weigh = prio_to_weigh[prio]
+		 */
 		delta = calc_delta_mine(delta, NICE_0_LOAD, &se->load);
 
 	return delta;

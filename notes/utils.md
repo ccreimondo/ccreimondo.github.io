@@ -60,7 +60,7 @@ tc
 iptraf
 ```
 
-## Linux Perfermance
+## Linux Performance
 See [Linux Performance](http://www.brendangregg.com/linuxperf.html).
 
 

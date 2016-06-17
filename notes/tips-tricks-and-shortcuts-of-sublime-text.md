@@ -31,4 +31,4 @@
 - shift+cammand+R: global search for characters 
 - command+p: global search for files
 - command+p & #: local search for characters
-- command+P & @: local search for function
+- command+p & @: local search for function
