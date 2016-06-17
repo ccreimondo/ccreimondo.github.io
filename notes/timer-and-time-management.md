@@ -1,9 +1,8 @@
 # Timer and Time Management in Linux
-
->内核需要周期性地：
+内核需要周期性地：
 - 更新自系统启动以来所经过的时间
 - 更新时间和日期
-- 确定进程在每个CPU上已运行的时间，如果超过已分配的时间片，则抢占。[goto handler]()
+- 确定进程在每个CPU上已运行的时间，如果超过已分配的时间片，则抢占。
 - 更新资源使用统计
 - 检查每个软定时器的时间间隔是否已到
 
@@ -64,11 +63,10 @@ extern struct timespec wall_to_monotonic;
 `time_init()`->`get_cmos_time()`->init `xtime` and `wall_to_monotonic`
 
 #### Update
-See [The Timer Interrupt Handler](#the-timer-interrupt-handler)
+pass
 
 
 ## System Timer
-TODO
 
 ### tick, `HZ` and `jiffies`
 tick是内核连续两次时钟中断（由系统定时器周期性产生 e.g. PIT）的间隔（时间？）。全局变量`jiffies`用来记录自系统启动以来产生的tick的总数。内核中的`HZ`是tick rate，time(tick)=1/(tick_rate)。
@@ -277,6 +275,7 @@ readers`read_seqbegin`只读取`sequence`值，不会持有`spinlock`。`spinloc
 
 ## Related System Calls
 用户态下的进程通过gettimeofday()读取时间和日期。
+
 
 ## How does command `time` calculate time (user、system)?
 TODO

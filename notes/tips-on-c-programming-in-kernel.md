@@ -69,5 +69,6 @@ Why is `do { ... } while(0)`?
 
 A: See [Do-While and if-else statements in C/C++ macros](http://stackoverflow.com/questions/154136/do-while-and-if-else-statements-in-c-c-macros).
 
+
 ## Refernces
 - Brian W. Kernighan, Dennis M. Ritchie. The C Programming Language, 2rd Edition.

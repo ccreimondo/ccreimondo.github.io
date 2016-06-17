@@ -1,5 +1,6 @@
 # Linked List in Linux Kernel
 
+
 ## `list_head`
 
 ```c
@@ -56,6 +57,7 @@ struct list_head {
 - `offsetof`中`&((TYPE) *)0)->MEMBER`为什么需要转为`size_t`?`(char *)__mptr`为什么需要转换为`char *`？
 - 为什么不能`typeof(ptr) __mptr = ptr`，而要`typeof(((type *)0)->member) *__mptr = (ptr)`?我猜，指针只是单纯保存某变量的内存地址，无法体现变量的具体类型。
 - 为什么不直接`(ptr) - offsetof(type, member)`？`const typeof( ((type *)0)->member ) *__mptr = (ptr)`可以让编译器在编译时检查（ptr）是否符合指定指针类型(即是否是typeof((type *)0)->member))。这里，我们会把(ptr)转化为(char *)，如果不做类型检查，则无论ptr是什么都会编译通过。
+
 
 ## `list_for_each` and `list_for_each_entry`
 

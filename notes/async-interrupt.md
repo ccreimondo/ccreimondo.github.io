@@ -1,4 +1,4 @@
-# The Timer Interrupt handler
+# Asynchronous Interrupt
 我将借助内核中的周期性硬件时钟中断走一下linux异步中断的处理流程。我们默认计算机是单处理器，
 且所有的计时活动都是由全局定时器产生的中断触发的。Linux内核代码版本为2.6.34.71。
 

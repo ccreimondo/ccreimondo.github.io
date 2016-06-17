@@ -36,6 +36,25 @@ int exit_state;
 - `EXIT_DEAD`: 最终状态，由于父进程刚发出 `wait4()` or `waitpid()` 系统调用，因而进程由系统删除。
 
 
+## For Scheduling
+
+```c
+int prio, static_prio, normal_prio;
+unsigned int rt_priority;
+const struct sched_class *sched_class;
+struct sched_entity se;
+struct sched_rt_entity rt;
+```
+
+- static_prio: [0, 99] for rt, [100, 139] for normal task (corrosponding to [-20, 19] in nice). And we can found that real-time tasks always hava high priority than normal tasks.
+- prio: dynamic priority for normal tasks, caculated by static_prio and other factors.
+- normal_prio: legacy, same as prio.
+- rt_priority: dynamic priority for real-time tasks, caculated by static_prio and other factors.
+
+sched_entity、sched_rt_entity是task_struct中用于调度的变量拓展。sched_class中存有
+相关调度类的方法。
+
+
 ## Relationships Among Processes
 Linux 系统的进程之间存在一个明显的进程关系。
 
@@ -59,7 +78,7 @@ struct task_struct *group_leader;	/* threadgroup leader */
 - `sibling`: 指向兄弟进程链表中的下一个（前一个）的指针，这些兄弟进程的父进程为P。
 - `group_leader`: 指向P所在线程组领头线程的描述符。
 
->特别的，一个进程可能是一个进程组或者登录会话的领头进程，也可能是一个线程组的领头进程，它还可以跟踪其他进程的执行。
+特别的，一个进程可能是一个进程组或者登录会话的领头进程，也可能是一个线程组的领头进程，它还可以跟踪其他进程的执行。
 
 ## PID
 类Unix系统允许用户使用PID标示进程（系统自己用`struct task_struct *`）。PID在`task_struct`中的相关变量:
@@ -69,8 +88,7 @@ pid_t pid;
 pid_t tgid;
 ```
 
-- `tgid`: Thread Group ID, 该P所在线程组中第一个LWP的PID。一般进程只有一个线程，`tgid`与`pid`
-相同。对于一个多线程的进程，每个线程都会分配自己的`pid`，但`tgid`一定相同。`getpid()`返回`tgid`的值。
+- `tgid`: Thread Group ID, 该P所在线程组中第一个LWP的PID。一般进程只有一个线程，`tgid`与`pid`相同。对于一个多线程的进程，每个线程都会分配自己的`pid`，但`tgid`一定相同。`getpid()`返回`tgid`的值。
 
 ### `pidmap`
 
@@ -102,7 +120,19 @@ struct pid_namespace {
 由于循环使用PID编号，内核必须通过管理一个pidmap-array位图来表示当前已分配的PID号和闲置的PID号。因为一个页框包含32768个位，所以32位体系结构中pidmap-array位图存放在一个单独的页中。
 
 ### `struct pid_link pids[PIDTYPE_MAX]`
-为了快速完成PID->`task_struct`的映射，内核维护了几张哈希表。PID作为key，表值是个`hlink_head`。hash table的入口在哪里？TODO
+
+```c
+enum pid_type
+{
+	PIDTYPE_PID,
+	PIDTYPE_PGID,
+	PIDTYPE_SID,
+	PIDTYPE_MAX
+};
+
+```
+
+为了快速完成PID->`task_struct`的映射，内核维护了几张哈希表。PID作为key，表值是个`hlink_head`。
 
 
 ## Hardware Context and `struct thread_struct thread`
