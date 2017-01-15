@@ -2,8 +2,9 @@
 layout: post
 title:  "Setting Up Dual Monitors with Xrandr on Debian HOWTO"
 date:   2014-12-11 13:33:11
-categories: howto linux
+categories: linux
 ---
+
 - VGA1: external monitor
 - LVDS1: internal monitor
 

@@ -116,7 +116,7 @@ EXPORT_SYMBOL(get_jiffies_64);	/* EXPORT_SYMBOL: defined in linux/module.h */
 #define time_before(a,b)	time_after(b,a)
 ```
 `time_after(a,b)`表示a超过b时，返回真，否则返回假。该宏可以解决`jiffies`wrapround而导致错误比较结果的问题。unsigned integer to signed的转换如图（CSAPP.Figure.2.17）：
-![CSAPP.Figure.2.17](http://blog.reimondo.org/images/blog/csapp-figure-2-17.png)
+![CSAPP.Figure.2.17](images/csapp-figure-2-17.png)
 
 考虑这样一段代码
 

@@ -9,16 +9,12 @@ schedule()可以由几个内核控制路径调用，可以采取直接调用或�
 - 内核代码再一次具有可抢占性的时候（preempt_count == 0）
 
 两者有一定的联系，异常和中断返回之前先检查preempt_count再检查TIF_NEED_RESCHED。
-只有preempt_count == 0 && TIF_NEED_RESCHED == 1时才会调用schedule()。内核代
-码再一次具有可抢占性的时候指preempt_enable()之类的函数：使preemt_count为0，并在
-TIF_NEED_RESCHED == 1时调用preempt_schedule()。preempt_schedule()则是设置
-PREEMPT_ACTIVE后再调用schedule()。
+只有preempt_count == 0 && TIF_NEED_RESCHED == 1时才会调用schedule()。preempt_count
+不为0的情况后面会仔细说明。当preempt_enable()被调用时，它会减少preemt_count中的抢占计
+数器，若此时preempt_count为0且TIF_NEED_RESCHED == 1时，它还会调用preempt_schedule()。
+preempt_schedule()则是设置PREEMPT_ACTIVE后再调用schedule()。
 
-以上原则告诉我们：只有当内核正在执行异常处理程序（尤其是系统调用），而且内核抢
-占没有被显示禁用时，才可能抢占内核。此外，本地CPU必须打开本地中断，否则无法完成
-内核抢占（内核抢占指发生调度）。
-
-备注：preempt_count由四个字段组成，0～7为抢占计数器，8～15为软中断计数器，16～
+reempt_count由四个字段组成，0～7为抢占计数器，8～15为软中断计数器，16～
 27为硬中断计数器，28为PREEMPT_ACTIVE标志。它们分别会在以下情况被修改：
 - 显示禁用、解除本地CPU内核抢占会修改第一个计数器
  - preempt_enable() or preempt_enable_no_resched() or preempt_disable()...
@@ -27,6 +23,10 @@ PREEMPT_ACTIVE后再调用schedule()。
 - 进入和退出硬中断会修改第三个计数器
  - irq_enter() or irq_exit
 - preempt_schedule()会修改第四个PREEMPT_ACTIVE标志
+
+以上原则告诉我们：只有当内核正在执行异常处理程序（包括系统调用），而且内核抢
+占没有被显示禁用时，才可能发生内核抢占。此外，本地CPU必须打开本地中断，否则无法完成
+内核抢占（内核抢占指发生调度）。
 
 
 ## `schedule()`

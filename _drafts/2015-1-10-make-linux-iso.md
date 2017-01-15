@@ -49,7 +49,7 @@ mv iso.linux/casper/filesystem.squashfs .
 unsquashfs -d os.linux filesystem.squashfs
 ~~~
 
-![os linux files](http://blog.reimondo.org/images/blog/linux-mkiso-about-os-linux.png)
+![os linux files]({{ site.baseurl }}/assets/images/linux-mkiso-about-os-linux.png")
 
 ## Custom sth.
 
