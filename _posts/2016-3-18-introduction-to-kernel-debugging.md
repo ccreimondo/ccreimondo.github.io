@@ -56,4 +56,3 @@ Ubuntu Server x86 版本足够满足我们的需求。安装系统过程中，�
 - [Linux 内核编译初学者指南](http://zhoutall.com/archives/635)
 - [使用 GDB 和 KVM 调试 Linux 内核与模块](http://www.ibm.com/developerworks/cn/linux/1508_zhangdw_gdb/index.html)
 - [Using kgdb, kdb and the kernel debugger internals](https://www.kernel.org/doc/htmldocs/kgdb/index.html)
-

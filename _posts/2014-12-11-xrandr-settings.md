@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Setting Up Dual Monitors with Xrandr on Debian HOWTO"
-date:   2014-12-11 13:33:11
+date:   2014-12-11 00:00:00
 categories: linux
 ---
 

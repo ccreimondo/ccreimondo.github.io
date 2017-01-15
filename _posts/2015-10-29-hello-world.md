@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "世界，你好！"
-date:   2015-10-29 22:07:00
+date:   2015-10-29 00:00:00
 categories: thoughts
 ---
 
