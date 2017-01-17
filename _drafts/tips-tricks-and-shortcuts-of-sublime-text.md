@@ -1,7 +1,8 @@
 # Tips, Tricks and Shortcuts of Sublime Text 3
 
+
 ## Create A Project
-为源码目录创建一个project，最基本的配置如下。
+为源码目录创建一个 project，最基本的配置如下：
 
 ```json
 {
@@ -23,6 +24,7 @@
 
 - Vintageous  
 - C Improved
+- CTags
 - GAS-x86 (or x64) highlighting scheme
 
 

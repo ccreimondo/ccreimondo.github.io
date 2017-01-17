@@ -10,7 +10,7 @@ categories: thoughts
 
 
 ## Markdown
-Markdown 转 html 时，换行符变成 $，然后中文有一个空格，非常不舒服。vim 上没找着自动换行的功能，只好 sublime 写写文档了。
+Markdown 转 html 时，换行符变成 $，然后中文有一个空格，非常不舒服。vim 上没找着自动换行的功能，~~只好 sublime 写写文档了。~~手里还有 Typora 可以用，但不能 keyboard only。
 
 
 ## Jekyll
@@ -22,7 +22,7 @@ GitHub 默认支持 jekyll，那就这样吧。~~Pelican~~
 
 
 ## Linux
-macOS 上在用 sublime text 看源码，搜索功能一般，然而碰到嵌入 asm 的 c 的话就很不舒服。
+macOS 上在用 sublime text 看源码，搜索功能一般，然而碰到嵌入 asm 的 c 的话就很不舒服。~~VIM with ctags and ctrlp.~~
 
 
 ## Misc.
