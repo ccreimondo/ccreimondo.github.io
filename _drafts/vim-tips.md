@@ -17,19 +17,9 @@
 See `:help fold`.
 
 
-## Using hidden buffers
-See `:help ls`.
-
-- `:ls` for list of open buffers
-- `:bp` previous buffer
-- `:bn` next buffer
-- `:bn` (n is a number) movet to n'th buffer
-- `:b <filename part>` with tab-key providing auto-completion
-
-
 ## Copy & Paste
 
-- `p` `yy`
+- `p` and `yy`
 - `p` vs `P`
 
 
@@ -39,9 +29,22 @@ See `:help ls`.
 - `@:`
 
 
-## Show settings
+## Configuration
 
-- `:set compatible?` to check a specific one
+- `:set compatible?` to check a specific setting
 
 
-## Resize window
+## Using hidden buffers
+See `:help ls`.
+
+- `:ls` for list of open buffers
+- `:bp` previous buffer
+- `:bn` next buffer
+- `:bn` (n is a number) move to n'th buffer
+- `:b <filename part>` with tab-key providing auto-completion
+
+
+## Window resizing
+See `:help window`.
+
+
