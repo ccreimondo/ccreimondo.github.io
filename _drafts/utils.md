@@ -19,6 +19,8 @@ cat /etc/lsb_release
 # redhat or centos
 cat /etc/redhat-release
 cat /etc/centos-release
+# count lines of a project
+find . -name '*.[h|c]' | xargs wc -l
 ```
 
 
