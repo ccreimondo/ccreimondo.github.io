@@ -1,0 +1,136 @@
+# Booting a PC
+
+## More details in booting a PC
+- 1st instruction: [f000:fff0] 0xffff0: ljmp   $0xf000,$0xe05b
+- BIOS
+    - initlizes devices, sets of the interrupt routines
+    - reads the first sector of the boot device
+    - jumps to [0000:7c00] 0x07c00 that is the start address of bootloader
+- bootloader
+    - CPU changes from 16-bit real mode to 32-bit protected mode with fixed GDT
+        - fixed GDT means CS/DS use the whole address space that 
+          starts at 0x00000000 and ends at 0xffffffff, see `boot/boot.S`
+        - and after this step, memory address's demostration style 
+          changes from [0000:7c00] to 0x00007c00
+            - [0000:7c00]: 0x07c00 since PA = CS * 16 + IP in 16-bit real mode
+            - In 32-bit protected mode,  
+              LinearAddr = GDT[SegSelector](<=> base) + LogicalAddress,
+              however linear address should be less than the segement's limit.
+    - movl 0x00007c00, %esp to set up stack for C code in bootmain.c
+    - call bootmain()
+        - load kernel image and then jumps to entry
+- kernel
+    - entry:
+        - setup VM
+
+```
+.text
+
+# The Multiboot header
+.align 4
+.long MULTIBOOT_HEADER_MAGIC
+.long MULTIBOOT_HEADER_FLAGS
+.long CHECKSUM
+
+# Pseudo-code for the crt1.o (C RouTing) startup routine in every C program.
+# Note: The code that pushes the arguments for each function is not shown.
+# 0x080480c0 <_start>:       /* Entry point in .text */
+#    call __libc_init_first  /* Startup code in .text */
+#    call _init              /* Startup code in .init */
+#    call atexit             /* Startup code in .text */
+#    call main               /* Application main routine */
+#    call _exit              /* Returns control to OS */
+#    /* Control never reaches here */
+#
+# '_start' specifies the ELF entry point.  Since we haven't set up
+# virtual memory when the bootloader enters this code, we need the
+# bootloader to jump to the *physical* address of the entry point.
+# 
+.globl _start
+_start = RELOC(entry)
+
+.globl entry
+entry:
+    movw    $0x1234,0x472                   # warm boot
+
+    # We haven't set up virtual memory yet, so we're running from
+    # the physical address the boot loader loaded the kernel at: 1MB
+    # (plus a few bytes).  However, the C code is linked to run at
+    # KERNBASE+1MB.  Hence, we set up a trivial page directory that
+    # translates virtual addresses [KERNBASE, KERNBASE+4MB) to
+    # physical addresses [0, 4MB).  This 4MB region will be
+    # sufficient until we set up our real page table in mem_init
+    # in lab 2.
+
+    # Load the physical address of entry_pgdir into cr3.  entry_pgdir
+    # is defined in entrypgdir.c.
+    movl    $(RELOC(entry_pgdir)), %eax
+    movl    %eax, %cr3
+    # Turn on paging.
+    movl    %cr0, %eax
+    orl     $(CR0_PE|CR0_PG|CR0_WP), %eax
+    movl    %eax, %cr0
+
+    # Now paging is enabled, but we're still running at a low EIP
+    # (why is this okay?).  Jump up above KERNBASE before entering
+    # C code.
+    mov     $relocated, %eax
+    jmp     *%eax
+```
+
+        - setup the kernel stack for C code in init.c, see `inc/memlayout.h`
+
+```
+// @inc/memlayout.h
+
+// TODO: memlayout for a C program
+
+// All physical memory mapped at this address
+#define KERNBASE        0xF0000000
+// Kernel stack.
+#define KSTACKTOP       KERNBASE
+#define KSTKSIZE        (8*PGSIZE)              // size of a kernel stack
+#define KSTKGAP         (8*PGSIZE)              // size of a kernel stack guard
+```
+
+```
+// @kern/entry.S
+relocated:
+
+    # Clear the frame pointer register (EBP)
+    # so that once we get into debugging C code,
+    # stack backtraces will be terminated properly.
+    movl    $0x0,%ebp                       # nuke frame pointer
+
+    # Set the stack pointer
+    # What's the exact value of $(bootstacktop)
+    # e.g. mov $0xf0110000, $esp in obj/kern/kernel.asm
+    movl    $(bootstacktop),%esp
+
+    # now to C code
+    call    i386_init
+
+    # Should never get here, but in case we do, just spin.
+    spin:   jmp     spin
+
+
+.data
+###################################################################
+# boot stack
+###################################################################
+    .p2align        PGSHIFT         # force page alignment
+    .globl          bootstack
+bootstack:
+    .space          KSTKSIZE
+    .globl          bootstacktop
+bootstacktop:
+```
+
+        - call i386_init()
+    - init: TODO in the following labs
+
+## Related topics
+- `vprintf...`
+
+## References
+- CSAPP.EN.2/e CH3 CH7

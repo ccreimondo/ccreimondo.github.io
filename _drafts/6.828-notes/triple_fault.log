@@ -1,0 +1,95 @@
+f010164f <memset>:
+
+#if ASM
+void *
+memset(void *v, int c, size_t n)
+{
+f010164f:	55                   	push   %ebp
+f0101650:	89 e5                	mov    %esp,%ebp
+f0101652:	57                   	push   %edi
+f0101653:	56                   	push   %esi
+f0101654:	53                   	push   %ebx
+f0101655:	8b 7d 08             	mov    0x8(%ebp),%edi
+f0101658:	8b 4d 10             	mov    0x10(%ebp),%ecx
+	char *p;
+
+	if (n == 0)
+f010165b:	85 c9                	test   %ecx,%ecx
+f010165d:	74 13                	je     f0101672 <memset+0x23>
+		return v;
+	if ((int)v%4 == 0 && n%4 == 0) {
+f010165f:	f7 c7 03 00 00 00    	test   $0x3,%edi
+f0101665:	75 05                	jne    f010166c <memset+0x1d>
+f0101667:	f6 c1 03             	test   $0x3,%cl
+f010166a:	74 0d                	je     f0101679 <memset+0x2a>
+		c = (c<<24)|(c<<16)|(c<<8)|c;
+		asm volatile("cld; rep stosl\n"
+			:: "D" (v), "a" (c), "c" (n/4)
+			: "cc", "memory");
+	} else
+		asm volatile("cld; rep stosb\n"
+f010166c:	8b 45 0c             	mov    0xc(%ebp),%eax
+f010166f:	fc                   	cld    
+f0101670:	f3 aa                	rep stos %al,%es:(%edi)
+			:: "D" (v), "a" (c), "c" (n)
+			: "cc", "memory");
+	return v;
+}
+f0101672:	89 f8                	mov    %edi,%eax
+f0101674:	5b                   	pop    %ebx
+f0101675:	5e                   	pop    %esi
+f0101676:	5f                   	pop    %edi
+f0101677:	5d                   	pop    %ebp
+f0101678:	c3                   	ret    
+		c &= 0xFF;
+f0101679:	0f b6 55 0c          	movzbl 0xc(%ebp),%edx
+		c = (c<<24)|(c<<16)|(c<<8)|c;
+f010167d:	89 d3                	mov    %edx,%ebx
+f010167f:	c1 e3 08             	shl    $0x8,%ebx
+f0101682:	89 d0                	mov    %edx,%eax
+f0101684:	c1 e0 18             	shl    $0x18,%eax
+f0101687:	89 d6                	mov    %edx,%esi
+f0101689:	c1 e6 10             	shl    $0x10,%esi
+f010168c:	09 f0                	or     %esi,%eax
+f010168e:	09 c2                	or     %eax,%edx
+f0101690:	09 da                	or     %ebx,%edx
+			:: "D" (v), "a" (c), "c" (n/4)
+f0101692:	c1 e9 02             	shr    $0x2,%ecx
+		asm volatile("cld; rep stosl\n"
+f0101695:	89 d0                	mov    %edx,%eax
+f0101697:	fc                   	cld    
+f0101698:	f3 ab                	rep stos %eax,%es:(%edi)
+f010169a:	eb d6                	jmp    f0101672 <memset+0x23>
+
+
+
+
+
+
+(qemu) info registers
+EAX=00000000 EBX=00000000 ECX=000001a9 EDX=00000000
+ESI=00000000 EDI=f0113000 EBP=f010ffc8 ESP=f010ffbc
+EIP=f0101698 EFL=00000002 [-------] CPL=0 II=0 A20=1 SMM=0 HLT=0
+ES =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]
+CS =0008 00000000 ffffffff 00cf9a00 DPL=0 CS32 [-R-]
+SS =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]
+DS =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]
+FS =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]
+GS =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]
+LDT=0000 00000000 0000ffff 00008200 DPL=0 LDT
+TR =0000 00000000 0000ffff 00008b00 DPL=0 TSS32-busy
+GDT=     00007c4c 00000017
+IDT=     00000000 000003ff
+CR0=80010011 CR2=00000040 CR3=00112000 CR4=00000000
+DR0=00000000 DR1=00000000 DR2=00000000 DR3=00000000 
+DR6=ffff0ff0 DR7=00000400
+EFER=0000000000000000
+FCW=037f FSW=0000 [ST=0] FTW=00 MXCSR=00001f80
+FPR0=0000000000000000 0000 FPR1=0000000000000000 0000
+FPR2=0000000000000000 0000 FPR3=0000000000000000 0000
+FPR4=0000000000000000 0000 FPR5=0000000000000000 0000
+FPR6=0000000000000000 0000 FPR7=0000000000000000 0000
+XMM00=00000000000000000000000000000000 XMM01=00000000000000000000000000000000
+XMM02=00000000000000000000000000000000 XMM03=00000000000000000000000000000000
+XMM04=00000000000000000000000000000000 XMM05=00000000000000000000000000000000
+XMM06=00000000000000000000000000000000 XMM07=00000000000000000000000000000000
