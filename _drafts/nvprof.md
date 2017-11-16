@@ -1,0 +1,4 @@
+# nvprof
+
+Summary Mode
+
