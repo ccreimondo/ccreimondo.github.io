@@ -85,8 +85,36 @@ GENERATE_LATEX         = NO
 # This tag requires that the tag HAVE_DOT is set to YES.
 
 CALL_GRAPH             = YES
+
+# The INPUT tag is used to specify the files and/or directories that contain
+# documented source files. You may enter file names like myfile.cpp or
+# directories like /usr/src/myproject. Separate the files or directories with
+# spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
+# Note: If this tag is empty the current directory is searched.
+
+INPUT                  = ../
+
+# The RECURSIVE tag can be used to specify whether or not subdirectories should
+# be searched for input files as well.
+# The default value is: NO.
+
+RECURSIVE              = YES
+
+# The STRIP_FROM_PATH tag can be used to strip a user-defined part of the path.
+# Stripping is only done if one of the specified strings matches the left-hand
+# part of the path. The tag can be used to show relative paths in the file list.
+# If left blank the directory from which doxygen is run is used as the path to
+# strip.
+#
+# Note that you can specify absolute paths here, but also relative paths, which
+# will be relative from the directory where doxygen is started.
+# This tag requires that the tag FULL_PATH_NAMES is set to YES.
+
+STRIP_FROM_PATH        = ../
 ```
 
 Refs:
 - Doxygen usage example for C. http://fnch.users.sourceforge.net/doxygen_c.html.
 - Doxygen quickstart in 10 minutes. http://cedar-renjun.github.io/2014/03/21/learn-doxygen-in-10-minutes/.
+- Relative files paths in doxygen-generated documentation. https://stackoverflow.com/questions/6261366/relative-files-paths-in-doxygen-generated-documentation.
+- Doxygen does not find files when when specifying Source directory. https://stackoverflow.com/questions/18249741/doxygen-does-not-find-files-when-when-specifying-source-directory.
