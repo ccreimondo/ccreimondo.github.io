@@ -3,11 +3,11 @@
 title: BLOG@RH
 email: rhiswell#gmail.com
 description: > # this means to ignore newlines until "baseurl:"
-    Prefer some dark arts.
+    Used to note down some common tips.
 baseurl: "/" # the subpath of your site, e.g. /blog
 url: "https://rhiswell.github.io" # the base hostname & protocol for your site
 # static_files: "/assets"
-twitter_username: rhiswell
+#twitter_username: rhiswell
 github_username: rhiswell
 
 # Build settings
