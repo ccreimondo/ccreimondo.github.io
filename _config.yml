@@ -1,9 +1,9 @@
 
 # Site settings
-title: BLOG@RH
+title: RH's notepad
 email: rhiswell#gmail.com
 description: > # this means to ignore newlines until "baseurl:"
-    Used to note down some common tips.
+    Used to note down some common tips and see _drafts for more details.
 baseurl: "/" # the subpath of your site, e.g. /blog
 url: "https://rhiswell.github.io" # the base hostname & protocol for your site
 # static_files: "/assets"
